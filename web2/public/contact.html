@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ProBTC — Contact Us</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-color: #0a0a0a;
+      --text-color: #fff;
+      --card-bg: #111;
+      --accent: #ff6600;
+    }
+    [data-theme="light"] {
+      --bg-color: #f2f2f2;
+      --text-color: #111;
+      --card-bg: #fff;
+      --accent: #ff6600;
+    }
+    * {
+      margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth;
+    }
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      line-height: 1.6;
+      padding-top: 70px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    nav {
+      position: fixed;
+      top: 0; width: 100%;
+      background: var(--card-bg);
+      border-bottom: 2px solid var(--accent);
+      padding: 1rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 999;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+    nav .logo {
+      font-weight: 700;
+      font-size: 1.75rem;
+      color: var(--accent);
+      user-select: none;
+    }
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+    }
+    nav ul li a {
+      color: var(--text-color);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    nav ul li a:hover,
+    nav ul li a.active {
+      background-color: var(--accent);
+      color: #000;
+      box-shadow: 0 0 8px var(--accent);
+    }
+    .theme-toggle {
+      background: transparent;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+      padding: 0.4rem 0.8rem;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .theme-toggle:hover {
+      background-color: var(--accent);
+      color: #000;
+      box-shadow: 0 0 8px var(--accent);
+    }
+    main {
+      max-width: 900px;
+      margin: 2rem auto 4rem;
+      padding: 0 1rem;
+    }
+    h1 {
+      color: var(--accent);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    form {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px var(--accent);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 0.7rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid #444;
+      border-radius: 5px;
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+    button[type="submit"] {
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+      padding: 0.7rem 2rem;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: background-color 0.3s;
+      display: block;
+      margin: 0 auto;
+    }
+    button[type="submit"]:hover {
+      background: #ff8533;
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+  <nav>
+  <div class="logo">ProBTC</div>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="account-types.html">Account Types</a></li>
+    <li><a href="charts.html">Charts</a></li>
+    <li><a href="contact.html">Contact Us</a></li>
+    <li><a href="about.html">About Us</a></li>
+  </ul>
+  <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+</nav>
+
+
+  <main>
+    <h1>Contact Us</h1>
+    <form id="contactForm" novalidate>
+      <label for="name">Full Name</label>
+      <input type="text" id="name" name="name" placeholder="Your full name" required />
+      
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" placeholder="example@example.com" required />
+      
+      <label for="message">Message</label>
+      <textarea id="message" name="message" placeholder="Write your message here..." rows="5" required></textarea>
+      
+      <button type="submit">Send Message</button>
+    </form>
+  </main>
+
+  <script>
+    // Theme toggle & persistence
+    const themeToggleBtn = document.querySelector('.theme-toggle');
+    themeToggleBtn.addEventListener('click', () => {
+      const currentTheme = document.body.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      document.body.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    });
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.body.setAttribute('data-theme', savedTheme);
+
+    // Highlight active nav link
+    const links = document.querySelectorAll('nav ul li a');
+    links.forEach(link => {
+      if (link.href === location.href) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+
+    // Simple form validation & submit handler
+    const form = document.getElementById('contactForm');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if(!form.checkValidity()) {
+        alert('Please fill out all fields correctly.');
+        return;
+      }
+      // Simulate form submission
+      alert(`Thank you, ${form.name.value}! Your message has been sent.`);
+      form.reset();
+    });
+  </script>
+
+</body>
+</html>

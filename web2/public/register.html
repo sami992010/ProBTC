@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Register - ProBTC</title>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .form-box {
+      background: #111;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+      width: 350px;
+    }
+    h2 {
+      margin-bottom: 1.5rem;
+      color: #ff6600;
+      text-align: center;
+    }
+    input, select {
+      display: block;
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 4px;
+      background: #222;
+      color: #fff;
+      font-size: 1rem;
+    }
+    button {
+      background: #ff6600;
+      color: #fff;
+      padding: 0.75rem;
+      width: 100%;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background: #e65500;
+    }
+    a {
+      color: #ff6600;
+      text-decoration: none;
+      display: block;
+      margin-top: 1rem;
+      text-align: center;
+    }
+    .phone-group {
+      display: flex;
+      gap: 8px;
+    }
+    .phone-group select {
+      width: 40%;
+    }
+    .phone-group input {
+      width: 60%;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-box">
+    <h2>Create a ProBTC Account</h2>
+    <form>
+      <input type="text" name="fullname" placeholder="Full Name" required />
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Password" required />
+      
+      <div class="phone-group">
+        <select name="country_code" required>
+          <option value="" disabled selected>Country Code</option>
+          <option value="+1">🇺🇸 +1 (USA)</option>
+          <option value="+44">🇬🇧 +44 (UK)</option>
+          <option value="+91">🇮🇳 +91 (India)</option>
+          <option value="+61">🇦🇺 +61 (Australia)</option>
+          <option value="+81">🇯🇵 +81 (Japan)</option>
+          <option value="+49">🇩🇪 +49 (Germany)</option>
+          <option value="+33">🇫🇷 +33 (France)</option>
+          <option value="+7">🇷🇺 +7 (Russia)</option>
+          <option value="+55">🇧🇷 +55 (Brazil)</option>
+          <option value="+86">🇨🇳 +86 (China)</option>
+          <option value="+27">🇿🇦 +27 (South Africa)</option>
+          <option value="+234">🇳🇬 +234 (Nigeria)</option>
+          <option value="+39">🇮🇹 +39 (Italy)</option>
+          <option value="+64">🇳🇿 +64 (New Zealand)</option>
+          <option value="+82">🇰🇷 +82 (South Korea)</option>
+          <option value="+31">🇳🇱 +31 (Netherlands)</option>
+          <option value="+47">🇳🇴 +47 (Norway)</option>
+          <option value="+46">🇸🇪 +46 (Sweden)</option>
+          <option value="+41">🇨🇭 +41 (Switzerland)</option>
+          <option value="+34">🇪🇸 +34 (Spain)</option>
+          <option value="+351">🇵🇹 +351 (Portugal)</option>
+          <option value="+380">🇺🇦 +380 (Ukraine)</option>
+          <option value="+358">🇫🇮 +358 (Finland)</option>
+          <option value="+48">🇵🇱 +48 (Poland)</option>
+          <option value="+420">🇨🇿 +420 (Czech Republic)</option>
+          <option value="+36">🇭🇺 +36 (Hungary)</option>
+          <option value="+30">🇬🇷 +30 (Greece)</option>
+          <option value="+20">🇪🇬 +20 (Egypt)</option>
+          <option value="+972">🇮🇱 +972 (Israel)</option>
+          <option value="+966">🇸🇦 +966 (Saudi Arabia)</option>
+          <option value="+65">🇸🇬 +65 (Singapore)</option>
+          <option value="+62">🇮🇩 +62 (Indonesia)</option>
+          <option value="+63">🇵🇭 +63 (Philippines)</option>
+          <option value="+52">🇲🇽 +52 (Mexico)</option>
+          <option value="+54">🇦🇷 +54 (Argentina)</option>
+          <option value="+353">🇮🇪 +353 (Ireland)</option>
+        </select>
+        <input type="tel" name="phone" placeholder="Phone Number" required pattern="[0-9]{6,15}" />
+      </div>
+      
+      <input type="text" name="address" placeholder="Home Address" required />
+      <button type="submit">Register</button>
+    </form>
+    <a href="login.html">Already have an account? Login</a>
+  </div>
+</body>
+</html>

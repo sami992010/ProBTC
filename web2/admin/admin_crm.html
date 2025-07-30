@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProBTC - Admin CRM</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-color: #0a0a0a;
+      --text-color: #fff;
+      --card-bg: #111;
+      --accent: #ff6600;
+      --accent-light: rgba(255, 102, 0, 0.1);
+      --positive: #4caf50;
+      --negative: #e53935;
+      --warning: #ff9800;
+      --info: #2196f3;
+    }
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 250px 1fr;
+    }
+    /* Sidebar Styles */
+    .sidebar {
+      background: #111;
+      border-right: 1px solid var(--accent);
+      padding: 1rem 0;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+    }
+    .logo {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 1.5rem;
+      padding: 0 1rem 1.5rem;
+      border-bottom: 1px solid #333;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .logo i {
+      font-size: 1.8rem;
+    }
+    .nav-menu {
+      list-style: none;
+    }
+    .nav-menu li a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.8rem 1.5rem;
+      color: var(--text-color);
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+    .nav-menu li a:hover,
+    .nav-menu li a.active {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+    .nav-menu li a i {
+      width: 24px;
+      text-align: center;
+    }
+    /* Main Content Styles */
+    .main-content {
+      padding: 1.5rem;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #333;
+    }
+    .header h1 {
+      color: var(--accent);
+      font-size: 1.8rem;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+    /* Dashboard Cards */
+    .dashboard-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      border-left: 4px solid var(--accent);
+    }
+    .card h3 {
+      font-size: 1rem;
+      color: #aaa;
+      margin-bottom: 0.5rem;
+    }
+    .card .value {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+    .card.positive { border-left-color: var(--positive); }
+    .card.negative { border-left-color: var(--negative); }
+    .card.warning { border-left-color: var(--warning); }
+    .card.info { border-left-color: var(--info); }
+    /* Admin Tables */
+    .admin-section {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .section-header h2 {
+      color: var(--accent);
+      font-size: 1.3rem;
+    }
+    .search-filter {
+      display: flex;
+      gap: 1rem;
+    }
+    .search-filter input,
+    .search-filter select {
+      padding: 0.5rem 1rem;
+      background: #222;
+      border: 1px solid #333;
+      color: var(--text-color);
+      border-radius: 4px;
+    }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .admin-table th {
+      text-align: left;
+      padding: 0.8rem 1rem;
+      background: #222;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .admin-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid #333;
+    }
+    .admin-table tr:hover {
+      background: #222;
+    }
+    .status {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .status.active {
+      background: rgba(76, 175, 80, 0.2);
+      color: var(--positive);
+    }
+    .status.banned {
+      background: rgba(229, 57, 53, 0.2);
+      color: var(--negative);
+    }
+    .status.pending {
+      background: rgba(255, 152, 0, 0.2);
+      color: var(--warning);
+    }
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    .btn-sm {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.8rem;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+    }
+    .btn-primary:hover {
+      background: #ff8533;
+    }
+    .btn-success {
+      background: var(--positive);
+      color: #000;
+    }
+    .btn-danger {
+      background: var(--negative);
+      color: #fff;
+    }
+    .btn-warning {
+      background: var(--warning);
+      color: #000;
+    }
+    .btn-info {
+      background: var(--info);
+      color: #000;
+    }
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 2rem;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #333;
+    }
+    .modal-header h3 {
+      color: var(--accent);
+      font-size: 1.3rem;
+    }
+    .close-modal {
+      background: none;
+      border: none;
+      color: #aaa;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      background: #222;
+      border: 1px solid #333;
+      color: var(--text-color);
+      border-radius: 4px;
+    }
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    /* Tabs */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #333;
+      margin-bottom: 1.5rem;
+    }
+    .tab {
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .tab.active {
+      border-bottom-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    /* Responsive */
+    @media (max-width: 768px) {
+      body {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        display: none;
+      }
+      .dashboard-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="logo">
+      <i class="fas fa-coins"></i>
+      <span>ProBTC</span>
+    </div>
+    <ul class="nav-menu">
+      <li><a href="#" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+      <li><a href="#users"><i class="fas fa-users"></i> User Management</a></li>
+      <li><a href="#balances"><i class="fas fa-wallet"></i> Balance Control</a></li>
+      <li><a href="#trades"><i class="fas fa-exchange-alt"></i> Trade Management</a></li>
+      <li><a href="#coins"><i class="fas fa-coins"></i> Coin Management</a></li>
+      <li><a href="#settings"><i class="fas fa-cog"></i> Website Settings</a></li>
+      <li><a href="#maintenance"><i class="fas fa-tools"></i> Maintenance</a></li>
+      <li><a href="#verification"><i class="fas fa-user-check"></i> Verification</a></li>
+      <li><a href="#languages"><i class="fas fa-language"></i> Languages</a></li>
+      <li><a href="#navigation"><i class="fas fa-bars"></i> Navigation</a></li>
+      <li><a href="#logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <div class="header">
+      <h1>Admin Dashboard</h1>
+      <div class="user-info">
+        <span>Admin User</span>
+        <div class="user-avatar">A</div>
+      </div>
+    </div>
+
+    <!-- Dashboard Cards -->
+    <div class="dashboard-cards">
+      <div class="card">
+        <h3>Total Users</h3>
+        <div class="value">1,248</div>
+      </div>
+      <div class="card positive">
+        <h3>Active Users</h3>
+        <div class="value">1,042</div>
+      </div>
+      <div class="card negative">
+        <h3>Banned Users</h3>
+        <div class="value">56</div>
+      </div>
+      <div class="card warning">
+        <h3>Pending Verification</h3>
+        <div class="value">150</div>
+      </div>
+      <div class="card info">
+        <h3>Total Deposits</h3>
+        <div class="value">$2.4M</div>
+      </div>
+      <div class="card">
+        <h3>Total Withdrawals</h3>
+        <div class="value">$1.8M</div>
+      </div>
+      <div class="card positive">
+        <h3>Open Trades</h3>
+        <div class="value">342</div>
+      </div>
+      <div class="card negative">
+        <h3>Closed Trades</h3>
+        <div class="value">1,024</div>
+      </div>
+    </div>
+
+    <!-- User Management Section -->
+    <div class="admin-section" id="users-section">
+      <div class="section-header">
+        <h2><i class="fas fa-users"></i> User Management</h2>
+        <div class="search-filter">
+          <input type="text" placeholder="Search users...">
+          <select>
+            <option>All Status</option>
+            <option>Active</option>
+            <option>Banned</option>
+            <option>Pending</option>
+          </select>
+          <button class="btn btn-primary" onclick="openModal('add-user')">
+            <i class="fas fa-plus"></i> Add User
+          </button>
+        </div>
+      </div>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Account Type</th>
+            <th>Balance</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>#1001</td>
+            <td>John Doe</td>
+            <td>john@example.com</td>
+            <td>Pro</td>
+            <td>$12,450.00</td>
+            <td><span class="status active">Active</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick="openModal('edit-user')">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="confirmAction('ban')">
+                <i class="fas fa-ban"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>#1002</td>
+            <td>Jane Smith</td>
+            <td>jane@example.com</td>
+            <td>Basic</td>
+            <td>$3,200.00</td>
+            <td><span class="status active">Active</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-ban"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>#1003</td>
+            <td>Robert Johnson</td>
+            <td>robert@example.com</td>
+            <td>Institutional</td>
+            <td>$89,500.00</td>
+            <td><span class="status active">Active</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-ban"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>#1004</td>
+            <td>Emily Davis</td>
+            <td>emily@example.com</td>
+            <td>Pro</td>
+            <td>$7,800.00</td>
+            <td><span class="status banned">Banned</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-success">
+                <i class="fas fa-check"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>#1005</td>
+            <td>Michael Wilson</td>
+            <td>michael@example.com</td>
+            <td>Basic</td>
+            <td>$1,200.00</td>
+            <td><span class="status pending">Pending</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-success">
+                <i class="fas fa-check"></i>
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-ban"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Balance Control Section -->
+    <div class="admin-section" id="balances-section">
+      <div class="section-header">
+        <h2><i class="fas fa-wallet"></i> Balance Control</h2>
+        <div class="search-filter">
+          <input type="text" placeholder="Search users...">
+          <button class="btn btn-primary" onclick="openModal('adjust-balance')">
+            <i class="fas fa-plus-circle"></i> Adjust Balance
+          </button>
+        </div>
+      </div>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Current Balance</th>
+            <th>Last Transaction</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>#1001</td>
+            <td>John Doe</td>
+            <td>john@example.com</td>
+            <td>$12,450.00</td>
+            <td>Deposit: $1,000 (Today)</td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick="openModal('add-balance')">
+                <i class="fas fa-plus"></i> Add
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="openModal('remove-balance')">
+                <i class="fas fa-minus"></i> Remove
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>#1002</td>
+            <td>Jane Smith</td>
+            <td>jane@example.com</td>
+            <td>$3,200.00</td>
+            <td>Withdrawal: $500 (Yesterday)</td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-plus"></i> Add
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-minus"></i> Remove
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>#1003</td>
+            <td>Robert Johnson</td>
+            <td>robert@example.com</td>
+            <td>$89,500.00</td>
+            <td>Deposit: $10,000 (2 days ago)</td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-plus"></i> Add
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-minus"></i> Remove
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Trade Management Section -->
+    <div class="admin-section" id="trades-section">
+      <div class="section-header">
+        <h2><i class="fas fa-exchange-alt"></i> Trade Management</h2>
+        <div class="search-filter">
+          <input type="text" placeholder="Search trades...">
+          <select>
+            <option>All Status</option>
+            <option>Open</option>
+            <option>Closed</option>
+          </select>
+        </div>
+      </div>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Trade ID</th>
+            <th>User</th>
+            <th>Pair</th>
+            <th>Type</th>
+            <th>Entry Price</th>
+            <th>Current Price</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>#T-10001</td>
+            <td>John Doe</td>
+            <td>BTC/USDT</td>
+            <td>Buy</td>
+            <td>$42,350.00</td>
+            <td>$42,780.00</td>
+            <td>0.25 BTC</td>
+            <td><span class="status active">Open</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick="openModal('edit-trade')">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-times"></i> Close
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>#T-10002</td>
+            <td>Jane Smith</td>
+            <td>ETH/USDT</td>
+            <td>Sell</td>
+            <td>$2,350.00</td>
+            <td>$2,320.00</td>
+            <td>5 ETH</td>
+            <td><span class="status active">Open</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-times"></i> Close
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>#T-10003</td>
+            <td>Robert Johnson</td>
+            <td>SOL/USDT</td>
+            <td>Buy</td>
+            <td>$120.50</td>
+            <td>$125.75</td>
+            <td>50 SOL</td>
+            <td><span class="status active">Open</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-times"></i> Close
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>#T-10004</td>
+            <td>Emily Davis</td>
+            <td>ADA/USDT</td>
+            <td>Sell</td>
+            <td>$0.45</td>
+            <td>$0.42</td>
+            <td>1000 ADA</td>
+            <td><span class="status negative">Closed</span></td>
+            <td>
+              <button class="btn btn-sm btn-info">
+                <i class="fas fa-eye"></i> View
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Coin Management Section -->
+    <div class="admin-section" id="coins-section">
+      <div class="section-header">
+        <h2><i class="fas fa-coins"></i> Coin Management</h2>
+        <button class="btn btn-primary" onclick="openModal('add-coin')">
+          <i class="fas fa-plus"></i> Add Coin
+        </button>
+      </div>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Symbol</th>
+            <th>Price</th>
+            <th>24h Change</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Bitcoin</td>
+            <td>BTC</td>
+            <td>$42,780.00</td>
+            <td class="positive">+2.5%</td>
+            <td><span class="status active">Active</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-times"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Ethereum</td>
+            <td>ETH</td>
+            <td>$2,320.00</td>
+            <td class="negative">-1.2%</td>
+            <td><span class="status active">Active</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-times"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Solana</td>
+            <td>SOL</td>
+            <td>$125.75</td>
+            <td class="positive">+5.8%</td>
+            <td><span class="status active">Active</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-times"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Cardano</td>
+            <td>ADA</td>
+            <td>$0.42</td>
+            <td class="negative">-0.5%</td>
+            <td><span class="status active">Active</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-times"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>Polkadot</td>
+            <td>DOT</td>
+            <td>$6.80</td>
+            <td class="positive">+1.3%</td>
+            <td><span class="status negative">Disabled</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-success">
+                <i class="fas fa-check"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Website Settings Section -->
+    <div class="admin-section" id="settings-section">
+      <div class="section-header">
+        <h2><i class="fas fa-cog"></i> Website Settings</h2>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('general-settings')">General</div>
+        <div class="tab" onclick="switchTab('theme-settings')">Theme</div>
+        <div class="tab" onclick="switchTab('email-settings')">Email</div>
+        <div class="tab" onclick="switchTab('security-settings')">Security</div>
+      </div>
+
+      <div class="tab-content active" id="general-settings">
+        <form>
+          <div class="form-group">
+            <label>Website Title</label>
+            <input type="text" value="ProBTC Trading Platform">
+          </div>
+          <div class="form-group">
+            <label>Website URL</label>
+            <input type="text" value="https://probtc.com">
+          </div>
+          <div class="form-group">
+            <label>Contact Email</label>
+            <input type="email" value="support@probtc.com">
+          </div>
+          <div class="form-group">
+            <label>Contact Phone</label>
+            <input type="tel" value="+1 (555) 123-4567">
+          </div>
+          <div class="form-group">
+            <label>Default Currency</label>
+            <select>
+              <option>USD</option>
+              <option>EUR</option>
+              <option>GBP</option>
+              <option>BTC</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-danger">Cancel</button>
+            <button type="button" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="tab-content" id="theme-settings">
+        <form>
+          <div class="form-group">
+            <label>Primary Color</label>
+            <input type="color" value="#ff6600">
+          </div>
+          <div class="form-group">
+            <label>Dark Mode</label>
+            <select>
+              <option>Enabled</option>
+              <option>Disabled</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Logo</label>
+            <input type="file">
+          </div>
+          <div class="form-group">
+            <label>Favicon</label>
+            <input type="file">
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-danger">Cancel</button>
+            <button type="button" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Maintenance Mode Section -->
+    <div class="admin-section" id="maintenance-section">
+      <div class="section-header">
+        <h2><i class="fas fa-tools"></i> Maintenance Mode</h2>
+      </div>
+      <form>
+        <div class="form-group">
+          <label>
+            <input type="checkbox"> Enable Maintenance Mode
+          </label>
+          <small>When enabled, only administrators can access the website.</small>
+        </div>
+        <div class="form-group">
+          <label>Maintenance Message</label>
+          <textarea rows="4">We're currently performing scheduled maintenance. We'll be back online shortly. Thank you for your patience.</textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger">Cancel</button>
+          <button type="button" class="btn btn-primary">Save Settings</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- User Verification Section -->
+    <div class="admin-section" id="verification-section">
+      <div class="section-header">
+        <h2><i class="fas fa-user-check"></i> User Verification</h2>
+        <div class="search-filter">
+          <input type="text" placeholder="Search users...">
+          <select>
+            <option>All Status</option>
+            <option>Pending</option>
+            <option>Verified</option>
+            <option>Rejected</option>
+          </select>
+        </div>
+      </div>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Submitted</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>#1005</td>
+            <td>Michael Wilson</td>
+            <td>michael@example.com</td>
+            <td>Today</td>
+            <td><span class="status pending">Pending</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick="openModal('view-verification')">
+                <i class="fas fa-eye"></i> View
+              </button>
+              <button class="btn btn-sm btn-success">
+                <i class="fas fa-check"></i> Approve
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-times"></i> Reject
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>#1012</td>
+            <td>Sarah Johnson</td>
+            <td>sarah@example.com</td>
+            <td>Yesterday</td>
+            <td><span class="status pending">Pending</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-eye"></i> View
+              </button>
+              <button class="btn btn-sm btn-success">
+                <i class="fas fa-check"></i> Approve
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-times"></i> Reject
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>#1008</td>
+            <td>David Brown</td>
+            <td>david@example.com</td>
+            <td>2 days ago</td>
+            <td><span class="status active">Verified</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-eye"></i> View
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>#1015</td>
+            <td>Lisa Miller</td>
+            <td>lisa@example.com</td>
+            <td>3 days ago</td>
+            <td><span class="status negative">Rejected</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-eye"></i> View
+              </button>
+              <button class="btn btn-sm btn-success">
+                <i class="fas fa-check"></i> Approve
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Language Management Section -->
+    <div class="admin-section" id="languages-section">
+      <div class="section-header">
+        <h2><i class="fas fa-language"></i> Language Management</h2>
+        <button class="btn btn-primary" onclick="openModal('add-language')">
+          <i class="fas fa-plus"></i> Add Language
+        </button>
+      </div>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Language</th>
+            <th>Code</th>
+            <th>Status</th>
+            <th>Default</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>English</td>
+            <td>en</td>
+            <td><span class="status active">Active</span></td>
+            <td><input type="radio" name="default-language" checked></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-times"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Spanish</td>
+            <td>es</td>
+            <td><span class="status active">Active</span></td>
+            <td><input type="radio" name="default-language"></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-times"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>French</td>
+            <td>fr</td>
+            <td><span class="status active">Active</span></td>
+            <td><input type="radio" name="default-language"></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-times"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>German</td>
+            <td>de</td>
+            <td><span class="status negative">Disabled</span></td>
+            <td><input type="radio" name="default-language" disabled></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-success">
+                <i class="fas fa-check"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Navigation Management Section -->
+    <div class="admin-section" id="navigation-section">
+      <div class="section-header">
+        <h2><i class="fas fa-bars"></i> Navigation Management</h2>
+        <button class="btn btn-primary" onclick="openModal('add-menu-item')">
+          <i class="fas fa-plus"></i> Add Item
+        </button>
+      </div>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>URL</th>
+            <th>Order</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Home</td>
+            <td>/home</td>
+            <td>1</td>
+            <td><span class="status active">Active</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-times"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Account Types</td>
+            <td>/account-types</td>
+            <td>2</td>
+            <td><span class="status active">Active</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-times"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Charts</td>
+            <td>/charts</td>
+            <td>3</td>
+            <td><span class="status active">Active</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-times"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Contact Us</td>
+            <td>/contact</td>
+            <td>4</td>
+            <td><span class="status active">Active</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-times"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>About Us</td>
+            <td>/about</td>
+            <td>5</td>
+            <td><span class="status active">Active</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="fas fa-times"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>Blog</td>
+            <td>/blog</td>
+            <td>6</td>
+            <td><span class="status negative">Disabled</span></td>
+            <td>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-success">
+                <i class="fas fa-check"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Modals -->
+  <div class="modal" id="add-user-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add New User</h3>
+        <button class="close-modal" onclick="closeModal('add-user')">&times;</button>
+      </div>
+      <form>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" placeholder="Enter full name">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="Enter email">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" placeholder="Enter password">
+        </div>
+        <div class="form-group">
+          <label>Account Type</label>
+          <select>
+            <option>Basic</option>
+            <option>Pro</option>
+            <option>Institutional</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Initial Balance</label>
+          <input type="number" placeholder="0.00" step="0.01">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('add-user')">Cancel</button>
+          <button type="button" class="btn btn-primary">Create User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="edit-user-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Edit User</h3>
+        <button class="close-modal" onclick="closeModal('edit-user')">&times;</button>
+      </div>
+      <form>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" value="John Doe">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" value="john@example.com">
+        </div>
+        <div class="form-group">
+          <label>Account Type</label>
+          <select>
+            <option>Basic</option>
+            <option selected>Pro</option>
+            <option>Institutional</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select>
+            <option selected>Active</option>
+            <option>Banned</option>
+            <option>Pending</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('edit-user')">Cancel</button>
+          <button type="button" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="adjust-balance-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Adjust User Balance</h3>
+        <button class="close-modal" onclick="closeModal('adjust-balance')">&times;</button>
+      </div>
+      <form>
+        <div class="form-group">
+          <label>User</label>
+          <select>
+            <option>John Doe (john@example.com)</option>
+            <option>Jane Smith (jane@example.com)</option>
+            <option>Robert Johnson (robert@example.com)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Action</label>
+          <select>
+            <option>Add Balance</option>
+            <option>Remove Balance</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Amount</label>
+          <input type="number" placeholder="0.00" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Reason</label>
+          <textarea rows="3" placeholder="Enter reason for this adjustment"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('adjust-balance')">Cancel</button>
+          <button type="button" class="btn btn-primary">Process Adjustment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="add-balance-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add Balance to User</h3>
+        <button class="close-modal" onclick="closeModal('add-balance')">&times;</button>
+      </div>
+      <form>
+        <div class="form-group">
+          <label>User</label>
+          <input type="text" value="John Doe (john@example.com)" readonly>
+        </div>
+        <div class="form-group">
+          <label>Current Balance</label>
+          <input type="text" value="$12,450.00" readonly>
+        </div>
+        <div class="form-group">
+          <label>Amount to Add</label>
+          <input type="number" placeholder="0.00" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Reason</label>
+          <textarea rows="3" placeholder="Enter reason for adding balance"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('add-balance')">Cancel</button>
+          <button type="button" class="btn btn-primary">Add Balance</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="remove-balance-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Remove Balance from User</h3>
+        <button class="close-modal" onclick="closeModal('remove-balance')">&times;</button>
+      </div>
+      <form>
+        <div class="form-group">
+          <label>User</label>
+          <input type="text" value="John Doe (john@example.com)" readonly>
+        </div>
+        <div class="form-group">
+          <label>Current Balance</label>
+          <input type="text" value="$12,450.00" readonly>
+        </div>
+        <div class="form-group">
+          <label>Amount to Remove</label>
+          <input type="number" placeholder="0.00" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Reason</label>
+          <textarea rows="3" placeholder="Enter reason for removing balance"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('remove-balance')">Cancel</button>
+          <button type="button" class="btn btn-primary">Remove Balance</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="edit-trade-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Edit Trade</h3>
+        <button class="close-modal" onclick="closeModal('edit-trade')">&times;</button>
+      </div>
+      <form>
+        <div class="form-group">
+          <label>Trade ID</label>
+          <input type="text" value="#T-10001" readonly>
+        </div>
+        <div class="form-group">
+          <label>User</label>
+          <input type="text" value="John Doe" readonly>
+        </div>
+        <div class="form-group">
+          <label>Pair</label>
+          <input type="text" value="BTC/USDT" readonly>
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <input type="text" value="Buy" readonly>
+        </div>
+        <div class="form-group">
+          <label>Current Entry Price</label>
+          <input type="text" value="$42,350.00" readonly>
+        </div>
+        <div class="form-group">
+          <label>New Entry Price</label>
+          <input type="number" placeholder="Enter new entry price">
+        </div>
+        <div class="form-group">
+          <label>Amount</label>
+          <input type="text" value="0.25 BTC" readonly>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('edit-trade')">Cancel</button>
+          <button type="button" class="btn btn-primary">Update Trade</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="add-coin-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add New Coin</h3>
+        <button class="close-modal" onclick="closeModal('add-coin')">&times;</button>
+      </div>
+      <form>
+        <div class="form-group">
+          <label>Coin Name</label>
+          <input type="text" placeholder="Enter coin name">
+        </div>
+        <div class="form-group">
+          <label>Symbol</label>
+          <input type="text" placeholder="Enter symbol (e.g. BTC)">
+        </div>
+        <div class="form-group">
+          <label>Current Price</label>
+          <input type="number" placeholder="Enter current price">
+        </div>
+        <div class="form-group">
+          <label>24h Change (%)</label>
+          <input type="number" placeholder="Enter 24h change percentage">
+        </div>
+        <div class="form-group">
+          <label>Coin Logo</label>
+          <input type="file">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select>
+            <option>Active</option>
+            <option>Disabled</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('add-coin')">Cancel</button>
+          <button type="button" class="btn btn-primary">Add Coin</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="view-verification-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>User Verification Details</h3>
+        <button class="close-modal" onclick="closeModal('view-verification')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label>User Information</label>
+        <div style="background: #222; padding: 1rem; border-radius: 4px;">
+          <p><strong>Name:</strong> Michael Wilson</p>
+          <p><strong>Email:</strong> michael@example.com</p>
+          <p><strong>Account Type:</strong> Basic</p>
+          <p><strong>Registration Date:</strong> 2023-05-15</p>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Submitted Documents</label>
+        <div style="background: #222; padding: 1rem; border-radius: 4px;">
+          <p><strong>ID Document:</strong> <a href="#" style="color: var(--accent);">michael_wilson_id.jpg</a></p>
+          <p><strong>Proof of Address:</strong> <a href="#" style="color: var(--accent);">michael_wilson_poa.pdf</a></p>
+          <p><strong>Selfie with ID:</strong> <a href="#" style="color: var(--accent);">michael_wilson_selfie.jpg</a></p>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Verification Notes</label>
+        <textarea rows="4" placeholder="Enter any notes about this verification"></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-danger">Reject</button>
+        <button type="button" class="btn btn-success">Approve</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="add-language-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add New Language</h3>
+        <button class="close-modal" onclick="closeModal('add-language')">&times;</button>
+      </div>
+      <form>
+        <div class="form-group">
+          <label>Language Name</label>
+          <input type="text" placeholder="Enter language name">
+        </div>
+        <div class="form-group">
+          <label>Language Code</label>
+          <input type="text" placeholder="Enter 2-letter code (e.g. 'es')">
+        </div>
+        <div class="form-group">
+          <label>Language File</label>
+          <input type="file">
+        </div>
+        <div class="form-group">
+          <label>Set as Default</label>
+          <input type="checkbox">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select>
+            <option>Active</option>
+            <option>Disabled</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('add-language')">Cancel</button>
+          <button type="button" class="btn btn-primary">Add Language</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="add-menu-item-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add Navigation Item</h3>
+        <button class="close-modal" onclick="closeModal('add-menu-item')">&times;</button>
+      </div>
+      <form>
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" placeholder="Enter menu item title">
+        </div>
+        <div class="form-group">
+          <label>URL</label>
+          <input type="text" placeholder="Enter URL (e.g. '/about')">
+        </div>
+        <div class="form-group">
+          <label>Order</label>
+          <input type="number" placeholder="Enter display order">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select>
+            <option>Active</option>
+            <option>Disabled</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('add-menu-item')">Cancel</button>
+          <button type="button" class="btn btn-primary">Add Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Modal functions
+    function openModal(modalId) {
+      document.getElementById(`${modalId}-modal`).style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(`${modalId}-modal`).style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      if (event.target.className === 'modal') {
+        event.target.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    // Tab switching
+    function switchTab(tabId) {
+      // Hide all tab contents
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      // Deactivate all tabs
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      // Activate selected tab
+      document.querySelector(`.tab[onclick="switchTab('${tabId}')"]`).classList.add('active');
+
+      // Show selected tab content
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    // Confirmation dialog
+    function confirmAction(action) {
+      if (confirm(`Are you sure you want to ${action} this user?`)) {
+        alert(`User has been ${action}ned successfully.`);
+      }
+    }
+  </script>
+</body>
+</html>

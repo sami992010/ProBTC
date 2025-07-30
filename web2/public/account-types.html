@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ProBTC — Pricing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --bg-color: #0a0a0a;
+      --text-color: #fff;
+      --card-bg: #111;
+      --accent: #ff6600;
+      --secondary: #2a2a2a;
+      --highlight: #ff8c00;
+    }
+    [data-theme="light"] {
+      --bg-color: #f8f9fa;
+      --text-color: #333;
+      --card-bg: #fff;
+      --accent: #ff6600;
+      --secondary: #e9ecef;
+      --highlight: #ff8c00;
+    }
+    * {
+      margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth;
+    }
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      line-height: 1.6;
+      padding-top: 70px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    nav {
+      position: fixed;
+      top: 0; width: 100%;
+      background: var(--card-bg);
+      border-bottom: 2px solid var(--accent);
+      padding: 1rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 999;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+    nav .logo {
+      font-weight: 700;
+      font-size: 1.75rem;
+      color: var(--accent);
+      user-select: none;
+    }
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+    nav ul li a {
+      color: var(--text-color);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    nav ul li a:hover,
+    nav ul li a.active {
+      background-color: var(--accent);
+      color: #000;
+      box-shadow: 0 0 8px var(--accent);
+    }
+    .account-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--secondary);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+    }
+    .account-link:hover {
+      background: var(--accent);
+    }
+    .account-link i {
+      font-size: 1.1rem;
+    }
+    .theme-toggle {
+      background: transparent;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+      padding: 0.4rem 0.8rem;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .theme-toggle:hover {
+      background-color: var(--accent);
+      color: #000;
+      box-shadow: 0 0 8px var(--accent);
+    }
+    main {
+      max-width: 1200px;
+      margin: 2rem auto 4rem;
+      padding: 0 1rem;
+    }
+    h1 {
+      color: var(--accent);
+      margin-bottom: 2rem;
+      text-align: center;
+      font-size: 2.5rem;
+      position: relative;
+      display: inline-block;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    h1:after {
+      content: '';
+      display: block;
+      width: 50%;
+      height: 3px;
+      background: var(--accent);
+      margin: 0.5rem auto 0;
+      border-radius: 3px;
+    }
+    .pricing-intro {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 3rem;
+      color: var(--text-color);
+      opacity: 0.9;
+    }
+    .pricing-tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+      gap: 1rem;
+    }
+    .pricing-tab {
+      padding: 0.75rem 1.5rem;
+      background: var(--secondary);
+      border: none;
+      border-radius: 30px;
+      color: var(--text-color);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .pricing-tab.active {
+      background: var(--accent);
+      color: #000;
+      box-shadow: 0 0 10px var(--accent);
+    }
+    .pricing-tab:hover:not(.active) {
+      background: var(--highlight);
+      color: #000;
+    }
+    .pricing-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .pricing-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      border: 1px solid var(--secondary);
+    }
+    .pricing-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+    }
+    .pricing-card.popular {
+      border: 2px solid var(--accent);
+    }
+    .popular-badge {
+      position: absolute;
+      top: 0;
+      right: 20px;
+      background: var(--accent);
+      color: #000;
+      padding: 0.25rem 1rem;
+      font-weight: 700;
+      font-size: 0.8rem;
+      border-radius: 0 0 5px 5px;
+      text-transform: uppercase;
+    }
+    .card-header {
+      padding: 1.5rem;
+      text-align: center;
+      background: linear-gradient(135deg, var(--secondary), var(--card-bg));
+      border-bottom: 1px solid var(--secondary);
+    }
+    .card-header h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+    }
+    .card-header .price {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 1rem 0;
+    }
+    .card-header .price span {
+      font-size: 1rem;
+      opacity: 0.8;
+    }
+    .card-body {
+      padding: 1.5rem;
+    }
+    .features-list {
+      list-style: none;
+      margin-bottom: 2rem;
+    }
+    .features-list li {
+      padding: 0.5rem 0;
+      display: flex;
+      align-items: center;
+    }
+    .features-list li i {
+      color: var(--accent);
+      margin-right: 0.75rem;
+      font-size: 0.9rem;
+    }
+    .card-footer {
+      padding: 0 1.5rem 1.5rem;
+      text-align: center;
+    }
+    .btn-primary {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background: var(--accent);
+      color: #000;
+      font-weight: 600;
+      border-radius: 30px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+    }
+    .btn-primary:hover {
+      background: var(--highlight);
+      box-shadow: 0 0 15px var(--accent);
+    }
+    .comparison-table {
+      margin-top: 4rem;
+      overflow-x: auto;
+    }
+    .comparison-table h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: var(--accent);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card-bg);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--secondary);
+    }
+    th {
+      background: var(--secondary);
+      font-weight: 600;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    .feature-name {
+      font-weight: 500;
+    }
+    .feature-value {
+      text-align: center;
+    }
+    .feature-value i {
+      color: var(--accent);
+    }
+    .fa-check {
+      color: #4CAF50;
+    }
+    .fa-times {
+      color: #F44336;
+    }
+    @media (max-width: 768px) {
+      nav {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      nav ul {
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .pricing-tabs {
+        flex-wrap: wrap;
+      }
+      .pricing-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+<nav>
+  <div class="logo">ProBTC</div>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="pricing.html" class="active">Pricing</a></li>
+    <li><a href="charts.html">Charts</a></li>
+    <li><a href="contact.html">Contact Us</a></li>
+    <li><a href="about.html">About Us</a></li>
+    <li><a href="my_account.html" class="account-link"><i class="fas fa-user-circle"></i> My Account</a></li>
+  </ul>
+  <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+</nav>
+
+<main>
+  <h1>Choose Your Plan</h1>
+  <div class="pricing-intro">
+    <p>Select the account type that fits your trading needs. All plans include 24/7 customer support and access to our trading platform.</p>
+  </div>
+
+  <div class="pricing-tabs">
+    <button class="pricing-tab active" data-tab="retail">Retail Accounts</button>
+    <button class="pricing-tab" data-tab="professional">Professional Accounts</button>
+  </div>
+
+  <div class="pricing-cards" id="retail-tab">
+    <div class="pricing-card">
+      <div class="card-header">
+        <h2>Basic</h2>
+        <div class="price">$250</div>
+        <p>Minimum deposit</p>
+      </div>
+      <div class="card-body">
+        <ul class="features-list">
+          <li><i class="fas fa-check"></i> Spread from 1.8 pips</li>
+          <li><i class="fas fa-check"></i> Leverage up to 1:500</li>
+          <li><i class="fas fa-check"></i> Minimum lot size 0.01</li>
+          <li><i class="fas fa-check"></i> 24/5 customer support</li>
+          <li><i class="fas fa-check"></i> Access to all trading instruments</li>
+          <li><i class="fas fa-times"></i> Personal account manager</li>
+          <li><i class="fas fa-times"></i> Trading signals</li>
+          <li><i class="fas fa-times"></i> Premium analytics</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <button class="btn-primary">Get Started</button>
+      </div>
+    </div>
+
+    <div class="pricing-card popular">
+      <div class="popular-badge">Most Popular</div>
+      <div class="card-header">
+        <h2>Standard</h2>
+        <div class="price">$2,500</div>
+        <p>Minimum deposit</p>
+      </div>
+      <div class="card-body">
+        <ul class="features-list">
+          <li><i class="fas fa-check"></i> Spread from 1.5 pips</li>
+          <li><i class="fas fa-check"></i> Leverage up to 1:400</li>
+          <li><i class="fas fa-check"></i> Minimum lot size 0.01</li>
+          <li><i class="fas fa-check"></i> 24/5 priority support</li>
+          <li><i class="fas fa-check"></i> Access to all trading instruments</li>
+          <li><i class="fas fa-check"></i> Personal account manager</li>
+          <li><i class="fas fa-check"></i> Weekly trading signals</li>
+          <li><i class="fas fa-times"></i> Premium analytics</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <button class="btn-primary">Get Started</button>
+      </div>
+    </div>
+
+    <div class="pricing-card">
+      <div class="card-header">
+        <h2>Premium</h2>
+        <div class="price">$25,000</div>
+        <p>Minimum deposit</p>
+      </div>
+      <div class="card-body">
+        <ul class="features-list">
+          <li><i class="fas fa-check"></i> Spread from 1.2 pips</li>
+          <li><i class="fas fa-check"></i> Leverage up to 1:300</li>
+          <li><i class="fas fa-check"></i> Minimum lot size 0.01</li>
+          <li><i class="fas fa-check"></i> 24/5 VIP support</li>
+          <li><i class="fas fa-check"></i> Access to all trading instruments</li>
+          <li><i class="fas fa-check"></i> Dedicated account manager</li>
+          <li><i class="fas fa-check"></i> Daily trading signals</li>
+          <li><i class="fas fa-check"></i> Premium analytics</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <button class="btn-primary">Get Started</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="pricing-cards" id="professional-tab" style="display: none;">
+    <div class="pricing-card">
+      <div class="card-header">
+        <h2>ECN</h2>
+        <div class="price">$50,000</div>
+        <p>Minimum deposit</p>
+      </div>
+      <div class="card-body">
+        <ul class="features-list">
+          <li><i class="fas fa-check"></i> Raw spreads from 0 pips</li>
+          <li><i class="fas fa-check"></i> Commission $3.5 per lot</li>
+          <li><i class="fas fa-check"></i> Leverage up to 1:200</li>
+          <li><i class="fas fa-check"></i> Minimum lot size 0.01</li>
+          <li><i class="fas fa-check"></i> 24/5 VIP support</li>
+          <li><i class="fas fa-check"></i> Access to all trading instruments</li>
+          <li><i class="fas fa-check"></i> Dedicated account manager</li>
+          <li><i class="fas fa-check"></i> Real-time trading signals</li>
+          <li><i class="fas fa-check"></i> Advanced analytics</li>
+          <li><i class="fas fa-check"></i> Direct market access</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <button class="btn-primary">Contact Sales</button>
+      </div>
+    </div>
+
+    <div class="pricing-card">
+      <div class="card-header">
+        <h2>VIP</h2>
+        <div class="price">$100,000</div>
+        <p>Minimum deposit</p>
+      </div>
+      <div class="card-body">
+        <ul class="features-list">
+          <li><i class="fas fa-check"></i> Raw spreads from 0 pips</li>
+          <li><i class="fas fa-check"></i> Commission $2.5 per lot</li>
+          <li><i class="fas fa-check"></i> Leverage up to 1:100</li>
+          <li><i class="fas fa-check"></i> Minimum lot size 0.1</li>
+          <li><i class="fas fa-check"></i> 24/7 VIP support</li>
+          <li><i class="fas fa-check"></i> Access to all trading instruments</li>
+          <li><i class="fas fa-check"></i> Senior account manager</li>
+          <li><i class="fas fa-check"></i> Premium trading signals</li>
+          <li><i class="fas fa-check"></i> Institutional-grade analytics</li>
+          <li><i class="fas fa-check"></i> Direct market access</li>
+          <li><i class="fas fa-check"></i> Custom trading solutions</li>
+          <li><i class="fas fa-check"></i> Exclusive market research</li>
+          <li><i class="fas fa-check"></i> AI Arbitrage Trading</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <button class="btn-primary">Contact Sales</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="comparison-table">
+    <h2>Feature Comparison</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Basic</th>
+          <th>Standard</th>
+          <th>Premium</th>
+          <th>ECN</th>
+          <th>VIP</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="feature-name">Minimum Deposit</td>
+          <td class="feature-value">$250</td>
+          <td class="feature-value">$2,500</td>
+          <td class="feature-value">$25,000</td>
+          <td class="feature-value">$50,000</td>
+          <td class="feature-value">$100,000</td>
+        </tr>
+        <tr>
+          <td class="feature-name">Spreads</td>
+          <td class="feature-value">From 1.8 pips</td>
+          <td class="feature-value">From 1.5 pips</td>
+          <td class="feature-value">From 1.2 pips</td>
+          <td class="feature-value">From 0 pips</td>
+          <td class="feature-value">From 0 pips</td>
+        </tr>
+        <tr>
+          <td class="feature-name">Commission</td>
+          <td class="feature-value">$0</td>
+          <td class="feature-value">$0</td>
+          <td class="feature-value">$0</td>
+          <td class="feature-value">$3.5/lot</td>
+          <td class="feature-value">$2.5/lot</td>
+        </tr>
+        <tr>
+          <td class="feature-name">Leverage</td>
+          <td class="feature-value">1:500</td>
+          <td class="feature-value">1:400</td>
+          <td class="feature-value">1:300</td>
+          <td class="feature-value">1:200</td>
+          <td class="feature-value">1:100</td>
+        </tr>
+        <tr>
+          <td class="feature-name">Account Manager</td>
+          <td class="feature-value"><i class="fas fa-times"></i></td>
+          <td class="feature-value"><i class="fas fa-check"></i></td>
+          <td class="feature-value"><i class="fas fa-check"></i></td>
+          <td class="feature-value"><i class="fas fa-check"></i></td>
+          <td class="feature-value"><i class="fas fa-check"></i></td>
+        </tr>
+        <tr>
+          <td class="feature-name">Trading Signals</td>
+          <td class="feature-value"><i class="fas fa-times"></i></td>
+          <td class="feature-value">Weekly</td>
+          <td class="feature-value">Daily</td>
+          <td class="feature-value">Real-time</td>
+          <td class="feature-value">Premium</td>
+        </tr>
+        <tr>
+          <td class="feature-name">AI Arbitrage</td>
+          <td class="feature-value"><i class="fas fa-times"></i></td>
+          <td class="feature-value"><i class="fas fa-times"></i></td>
+          <td class="feature-value"><i class="fas fa-times"></i></td>
+          <td class="feature-value"><i class="fas fa-times"></i></td>
+          <td class="feature-value"><i class="fas fa-check"></i></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+  // Theme toggle & persistence
+  const themeToggleBtn = document.querySelector('.theme-toggle');
+  themeToggleBtn.addEventListener('click', () => {
+    const currentTheme = document.body.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    document.body.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+  });
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.body.setAttribute('data-theme', savedTheme);
+
+  // Highlight active nav link
+  const links = document.querySelectorAll('nav ul li a');
+  links.forEach(link => {
+    if (link.href === location.href) {
+      link.classList.add('active');
+    } else {
+      link.classList.remove('active');
+    }
+  });
+
+  // Pricing tabs functionality
+  const tabs = document.querySelectorAll('.pricing-tab');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      document.getElementById('retail-tab').style.display = tab.dataset.tab === 'retail' ? 'grid' : 'none';
+      document.getElementById('professional-tab').style.display = tab.dataset.tab === 'professional' ? 'grid' : 'none';
+    });
+  });
+</script>
+
+</body>
+</html>

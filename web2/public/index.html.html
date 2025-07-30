@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ProTradeX — Premium Trading Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --bg-color: #0a0a0a;
+      --text-color: #fff;
+      --card-bg: #111;
+      --accent: #ff6600;
+      --accent-light: #ff8c42;
+      --positive: #00c853;
+      --negative: #ff3d00;
+    }
+    [data-theme="light"] {
+      --bg-color: #f2f2f2;
+      --text-color: #111;
+      --card-bg: #fff;
+      --accent: #ff6600;
+      --accent-light: #ff8c42;
+      --positive: #00a344;
+      --negative: #d32f2f;
+    }
+    * {
+      margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth;
+    }
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      line-height: 1.6;
+      padding-top: 80px;
+      background-image: url('https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
+      transition: background-color 0.3s, color 0.3s;
+      overflow-x: hidden;
+    }
+    nav {
+      position: fixed;
+      top: 0; width: 100%;
+      background: rgba(17, 17, 17, 0.95);
+      border-bottom: 2px solid var(--accent);
+      padding: 1rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 999;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+    }
+    nav .logo {
+      font-weight: 700;
+      font-size: 1.75rem;
+      color: var(--accent);
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    nav .logo i {
+      font-size: 1.5rem;
+    }
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+    }
+    nav ul li a {
+      color: var(--text-color);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
+    nav ul li a:hover,
+    nav ul li a.active {
+      background-color: var(--accent);
+      color: #000;
+      box-shadow: 0 0 15px var(--accent);
+      transform: translateY(-2px);
+    }
+    .theme-toggle {
+      background: transparent;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .theme-toggle:hover {
+      background-color: var(--accent);
+      color: #000;
+      box-shadow: 0 0 15px var(--accent);
+    }
+
+    /* Enhanced Ticker with Bubble Effect */
+    .ticker {
+      display: flex;
+      overflow: hidden;
+      white-space: nowrap;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 0.75rem 0;
+      font-weight: 600;
+      color: var(--accent);
+      font-size: 1rem;
+      border-top: 2px solid var(--accent);
+      border-bottom: 2px solid var(--accent);
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+    }
+
+    .ticker-container {
+      display: flex;
+      animation: tickerScroll 60s linear infinite;
+      padding-left: 100%;
+    }
+
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      margin: 0 2rem;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .bubble-container {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .price-bubble {
+      position: absolute;
+      top: -50px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(17, 17, 17, 0.95);
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 100;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+      min-width: 120px;
+      text-align: center;
+      backdrop-filter: blur(5px);
+    }
+
+    .price-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 8px 8px 0;
+      border-style: solid;
+      border-color: var(--accent) transparent transparent;
+    }
+
+    .price-bubble.up {
+      border-color: var(--positive);
+      color: var(--positive);
+    }
+
+    .price-bubble.up::after {
+      border-color: var(--positive) transparent transparent;
+    }
+
+    .price-bubble.down {
+      border-color: var(--negative);
+      color: var(--negative);
+    }
+
+    .price-bubble.down::after {
+      border-color: var(--negative) transparent transparent;
+    }
+
+    .bubble-container:hover .price-bubble {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-5px);
+    }
+
+    .price-up {
+      color: var(--positive);
+    }
+
+    .price-down {
+      color: var(--negative);
+    }
+
+    @keyframes tickerScroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* Rest of your existing CSS remains unchanged */
+    main {
+      max-width: 1400px;
+      margin: 3rem auto 4rem;
+      padding: 2.5rem;
+      text-align: center;
+      background-color: rgba(0, 0, 0, 0.8);
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(255, 102, 0, 0.4);
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      transform: translateY(40px);
+      animation: fadeIn 1.2s ease-out forwards;
+      position: relative;
+      z-index: 5;
+      border: 1px solid rgba(255,102,0,0.2);
+    }
+    h1 {
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      font-size: 3rem;
+      text-shadow: 0 0 15px rgba(255, 102, 0, 0.5);
+      font-weight: 700;
+    }
+    h2 {
+      color: var(--accent);
+      margin: 2rem 0;
+      font-size: 2.2rem;
+      font-weight: 600;
+    }
+    h3 {
+      color: var(--accent);
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      color: #ddd;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      color: #000;
+      font-weight: 700;
+      padding: 1rem 2.5rem;
+      border-radius: 30px;
+      text-decoration: none;
+      margin: 1.5rem 0;
+      transition: all 0.3s;
+      box-shadow: 0 5px 20px rgba(255, 102, 0, 0.4);
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-button:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(255, 102, 0, 0.6);
+    }
+    .cta-button::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to bottom right,
+        transparent,
+        transparent,
+        transparent,
+        rgba(255,255,255,0.3),
+        transparent,
+        transparent,
+        transparent
+      );
+      transform: rotate(30deg);
+      animation: shine 6s infinite;
+    }
+    .assets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin: 3rem 0;
+    }
+    .asset-card {
+      background: rgba(17, 17, 17, 0.9);
+      border-radius: 15px;
+      padding: 1.5rem;
+      border: 1px solid var(--accent);
+      transition: all 0.3s;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+      backdrop-filter: blur(5px);
+      text-align: left;
+    }
+    .asset-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(255, 102, 0, 0.3);
+    }
+    .asset-card img {
+      width: 40px;
+      height: 40px;
+      margin-right: 1rem;
+      object-fit: contain;
+    }
+    .asset-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .asset-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    .asset-symbol {
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+    .asset-price {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .asset-change {
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      display: inline-block;
+    }
+    .positive {
+      background: rgba(0, 200, 83, 0.15);
+      color: var(--positive);
+    }
+    .negative {
+      background: rgba(255, 61, 0, 0.15);
+      color: var(--negative);
+    }
+    .asset-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+    }
+    .buy-btn, .sell-btn {
+      flex: 1;
+      padding: 0.6rem;
+      border-radius: 8px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .buy-btn {
+      background: var(--positive);
+      color: #000;
+    }
+    .sell-btn {
+      background: var(--negative);
+      color: #000;
+    }
+    .buy-btn:hover, .sell-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    .trading-center {
+      background: rgba(17, 17, 17, 0.9);
+      border-radius: 20px;
+      padding: 2.5rem;
+      margin: 4rem 0;
+      border: 1px solid var(--accent);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .trading-center::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to bottom right,
+        transparent,
+        transparent,
+        transparent,
+        var(--accent),
+        transparent,
+        transparent,
+        transparent
+      );
+      animation: shine 6s infinite;
+      opacity: 0.3;
+    }
+    .trading-chart {
+      width: 100%;
+      height: 350px;
+      background: #000;
+      border-radius: 15px;
+      margin: 2rem 0;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,102,0,0.3);
+    }
+    .chart-line {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--accent);
+      animation: drawChart 4s infinite alternate;
+    }
+    .traders {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+      margin-top: 3rem;
+    }
+    .trader {
+      width: 140px;
+      text-align: center;
+      animation: float 4s ease-in-out infinite;
+    }
+    .trader:nth-child(2) {
+      animation-delay: 0.5s;
+    }
+    .trader:nth-child(3) {
+      animation-delay: 1s;
+    }
+    .trader img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid var(--accent);
+      object-fit: cover;
+      margin-bottom: 1rem;
+      box-shadow: 0 5px 20px rgba(255,102,0,0.3);
+    }
+    .trader h4 {
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      font-size: 1.3rem;
+    }
+    .trader p {
+      font-size: 1rem;
+      color: #aaa;
+    }
+    .stats {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 4rem 0;
+      gap: 1.5rem;
+    }
+    .stat-card {
+      background: rgba(255, 102, 0, 0.1);
+      border-radius: 15px;
+      padding: 2rem;
+      width: 220px;
+      border: 1px solid var(--accent);
+      backdrop-filter: blur(5px);
+      transition: all 0.3s;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    }
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(255, 102, 0, 0.3);
+    }
+    .stat-card h3 {
+      font-size: 2.8rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+    .stat-card p {
+      color: #ddd;
+      font-size: 1rem;
+    }
+    .payment-methods {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 3rem;
+      margin: 4rem 0;
+      padding: 2.5rem;
+      background: rgba(17, 17, 17, 0.9);
+      border-radius: 20px;
+      border: 1px solid var(--accent);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .payment-methods .payment-icon {
+      height: 50px;
+      filter: grayscale(30%);
+      transition: all 0.3s;
+    }
+    .payment-methods .wire-transfer {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: var(--text-color);
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      transition: all 0.3s;
+      font-size: 1.1rem;
+    }
+    .payment-methods .wire-transfer i {
+      font-size: 2.2rem;
+      color: var(--accent);
+    }
+    .payment-methods img:hover,
+    .payment-methods .wire-transfer:hover {
+      filter: grayscale(0%);
+      transform: scale(1.1);
+      background: rgba(255, 102, 0, 0.2);
+    }
+    .secondary-nav {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin: 3rem 0;
+      padding: 1.5rem;
+      background: rgba(17, 17, 17, 0.9);
+      border-radius: 15px;
+      border: 1px solid var(--accent);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    }
+    .secondary-nav a {
+      color: var(--text-color);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.75rem 1.5rem;
+      border-radius: 30px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.05rem;
+    }
+    .secondary-nav a:hover {
+      background-color: rgba(255, 102, 0, 0.3);
+      transform: translateY(-2px);
+    }
+    footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      background: rgba(17, 17, 17, 0.95);
+      border-top: 2px solid var(--accent);
+      margin-top: 4rem;
+    }
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 1.5rem 0;
+    }
+    .social-links a {
+      color: var(--text-color);
+      font-size: 1.8rem;
+      transition: all 0.3s;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.05);
+    }
+    .social-links a:hover {
+      color: var(--accent);
+      background: rgba(255,102,0,0.2);
+      transform: translateY(-5px);
+    }
+    /* Support Floating Buttons */
+    .support-floating {
+      position: fixed;
+      left: 20px;
+      bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      z-index: 999;
+    }
+    .support-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      color: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+      position: relative;
+      cursor: pointer;
+    }
+    .support-btn:hover {
+      transform: scale(1.1) translateY(-5px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    }
+    .support-btn.whatsapp {
+      background: #25D366;
+    }
+    .support-btn.telegram {
+      background: #0088cc;
+    }
+    .support-btn.ai {
+      background: linear-gradient(135deg, #ff6600, #ff8c42);
+    }
+    .support-tooltip {
+      position: absolute;
+      left: 70px;
+      white-space: nowrap;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .support-btn:hover .support-tooltip {
+      opacity: 1;
+    }
+    /* AI Chatbot Styles */
+    .chatbot-container {
+      position: fixed;
+      left: 20px;
+      bottom: 200px;
+      width: 350px;
+      background: rgba(17, 17, 17, 0.95);
+      border-radius: 15px;
+      border: 1px solid var(--accent);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      z-index: 1000;
+      transform: translateX(-400px);
+      transition: transform 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    .chatbot-container.open {
+      transform: translateX(0);
+    }
+    .chatbot-header {
+      padding: 15px;
+      background: rgba(255,102,0,0.2);
+      border-radius: 15px 15px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,102,0,0.3);
+    }
+    .chatbot-header h3 {
+      color: var(--accent);
+      margin: 0;
+      font-size: 1.2rem;
+    }
+    .chatbot-close {
+      background: none;
+      border: none;
+      color: var(--text-color);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .chatbot-messages {
+      height: 300px;
+      overflow-y: auto;
+      padding: 15px;
+    }
+    .message {
+      margin-bottom: 15px;
+      max-width: 80%;
+      padding: 10px 15px;
+      border-radius: 18px;
+      line-height: 1.4;
+    }
+    .bot-message {
+      background: rgba(255,255,255,0.1);
+      color: var(--text-color);
+      border-radius: 0 18px 18px 18px;
+      align-self: flex-start;
+    }
+    .user-message {
+      background: rgba(255,102,0,0.3);
+      color: white;
+      border-radius: 18px 0 18px 18px;
+      margin-left: auto;
+    }
+    .chatbot-input {
+      display: flex;
+      padding: 15px;
+      border-top: 1px solid rgba(255,102,0,0.3);
+    }
+    .chatbot-input input {
+      flex: 1;
+      padding: 10px 15px;
+      border-radius: 25px;
+      border: 1px solid rgba(255,102,0,0.5);
+      background: rgba(0,0,0,0.5);
+      color: var(--text-color);
+      outline: none;
+    }
+    .chatbot-input button {
+      background: var(--accent);
+      color: black;
+      border: none;
+      border-radius: 25px;
+      padding: 10px 20px;
+      margin-left: 10px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    /* New Styles for Enhanced Features */
+    .candlestick-chart {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+    .candlestick {
+      position: absolute;
+      width: 8px;
+      background: transparent;
+      animation: candleFloat 20s linear infinite;
+    }
+    .candlestick::before {
+      content: '';
+      position: absolute;
+      width: 2px;
+      height: 100%;
+      background: var(--accent);
+      left: 3px;
+    }
+    .candlestick::after {
+      content: '';
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 2px;
+      bottom: 0;
+    }
+    .candlestick.up {
+      --accent: var(--positive);
+    }
+    .candlestick.down {
+      --accent: var(--negative);
+    }
+    .floating-coins {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+    .floating-coin {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      animation: coinFloat 15s linear infinite;
+      opacity: 0.5;
+      filter: drop-shadow(0 0 5px rgba(255, 102, 0, 0.5));
+    }
+    .risk-disclosure {
+      background: rgba(255, 61, 0, 0.1);
+      border: 1px solid var(--negative);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      text-align: left;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .risk-disclosure h3 {
+      color: var(--negative);
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+    }
+    .risk-disclosure p {
+      font-size: 0.9rem;
+      color: #bbb;
+      margin-bottom: 0.8rem;
+      text-align: left;
+    }
+
+    /* Asset Category Tabs */
+    .asset-tabs {
+      display: flex;
+      justify-content: center;
+      margin: 2rem 0;
+      gap: 0.5rem;
+    }
+    .asset-tab {
+      padding: 0.8rem 1.5rem;
+      background: rgba(255, 102, 0, 0.1);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 600;
+    }
+    .asset-tab.active {
+      background: var(--accent);
+      color: #000;
+    }
+    .asset-tab:hover:not(.active) {
+      background: rgba(255, 102, 0, 0.2);
+    }
+
+    /* Responsive Styles */
+    @media(max-width: 992px) {
+      nav {
+        padding: 1rem;
+      }
+      nav ul {
+        gap: 1rem;
+      }
+      .ticker {
+        font-size: 0.9rem;
+      }
+      .ticker-item {
+        margin-right: 2rem;
+      }
+      main {
+        padding: 1.5rem;
+      }
+      h1 {
+        font-size: 2.2rem;
+      }
+      h2 {
+        font-size: 1.8rem;
+      }
+      .stat-card {
+        width: 180px;
+        padding: 1.5rem;
+      }
+      .payment-methods {
+        gap: 2rem;
+        padding: 1.5rem;
+      }
+      .chatbot-container {
+        width: 300px;
+      }
+      .assets-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      }
+    }
+    @media(max-width: 768px) {
+      nav {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+      }
+      nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .ticker {
+        font-size: 0.85rem;
+      }
+      .ticker-item {
+        margin-right: 1.5rem;
+      }
+      .stats {
+        gap: 1rem;
+      }
+      .stat-card {
+        width: 160px;
+        padding: 1rem;
+      }
+      .payment-methods {
+        gap: 1.5rem;
+      }
+      .payment-methods .payment-icon {
+        height: 40px;
+      }
+      .trader {
+        width: 120px;
+      }
+      .trader img {
+        width: 100px;
+        height: 100px;
+      }
+      .support-floating {
+        flex-direction: row;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .support-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+      }
+      .support-tooltip {
+        display: none;
+      }
+      .chatbot-container {
+        width: 90%;
+        left: 5%;
+        bottom: 120px;
+      }
+      .floating-coin {
+        width: 40px;
+        height: 40px;
+      }
+      .assets-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+    }
+    @media(max-width: 576px) {
+      body {
+        padding-top: 120px;
+      }
+      .stat-card {
+        width: 140px;
+      }
+      .payment-methods {
+        gap: 1rem;
+      }
+      .payment-methods .wire-transfer {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+      }
+      .secondary-nav a {
+        padding: 0.5rem 1rem;
+        font-size: 0.95rem;
+      }
+      .social-links a {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+      }
+      .floating-coin {
+        width: 30px;
+        height: 30px;
+      }
+      .asset-tabs {
+        flex-wrap: wrap;
+      }
+      .asset-tab {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes drawChart {
+      0% {
+        height: 2px;
+        transform: scaleY(0.1);
+      }
+      100% {
+        height: 100%;
+        transform: scaleY(1);
+      }
+    }
+    @keyframes shine {
+      0% {
+        transform: rotate(0deg) translate(-50%, -50%);
+      }
+      100% {
+        transform: rotate(360deg) translate(-50%, -50%);
+      }
+    }
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-15px);
+      }
+    }
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+    @keyframes candleFloat {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+      }
+    }
+    @keyframes coinFloat {
+      0% {
+        transform: translateY(100vh) translateX(0) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.5;
+      }
+      90% {
+        opacity: 0.5;
+      }
+      100% {
+        transform: translateY(-100px) translateX(100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  <!-- Japanese Candlestick Background -->
+  <div class="candlestick-chart" id="candlestickChart"></div>
+
+  <!-- Floating Crypto Coins -->
+  <div class="floating-coins" id="floatingCoins"></div>
+
+  <nav>
+    <div class="logo"><i class="fas fa-chart-line"></i>ProTradeX</div>
+    <ul>
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="account-types.html">Accounts</a></li>
+      <li><a href="my_account.html"><i class="fas fa-user-circle"></i> My Account</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="charts.html">Charts</a></li>
+      <li><a href="register.html">Register</a></li>
+      <li><a href="login.html">Login</a></li>
+    </ul>
+    <button class="theme-toggle" aria-label="Toggle Light/Dark Theme">
+      <i class="fas fa-moon"></i> Theme
+    </button>
+  </nav>
+
+  <!-- Enhanced Crypto Ticker with Bubble Effect -->
+  <div class="ticker" id="marketTicker">
+    <div class="ticker-container" id="tickerContainer">
+      <!-- Will be populated by JavaScript -->
+    </div>
+  </div>
+
+  <main>
+    <h1>Advanced Multi-Asset Trading Platform</h1>
+    <p>Trade cryptocurrencies, stocks, and commodities with institutional-grade tools, real-time data, and lowest fees in the industry</p>
+    <a href="register.html" class="cta-button pulse">Start Trading Now</a>
+
+    <!-- Asset Category Tabs -->
+    <div class="asset-tabs">
+      <div class="asset-tab active" data-category="crypto">Cryptocurrencies</div>
+      <div class="asset-tab" data-category="stocks-us">US Stocks</div>
+      <div class="asset-tab" data-category="stocks-eu">European Stocks</div>
+      <div class="asset-tab" data-category="commodities">Commodities</div>
+    </div>
+
+    <!-- Assets Grid -->
+    <div class="assets-grid" id="assetsGrid">
+      <!-- Assets will be populated by JavaScript -->
+    </div>
+
+    <div class="trading-center">
+      <h2>Professional Trading Terminal</h2>
+      <p>Access advanced charting tools, technical indicators, and real-time order books</p>
+      <div class="trading-chart">
+        <div class="chart-line"></div>
+      </div>
+      <div class="traders">
+        <div class="trader">
+          <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Trader">
+          <h4>Sarah K.</h4>
+          <p>Senior Analyst</p>
+        </div>
+        <div class="trader">
+          <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Trader">
+          <h4>Michael T.</h4>
+          <p>Portfolio Manager</p>
+        </div>
+        <div class="trader">
+          <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Trader">
+          <h4>Jennifer L.</h4>
+          <p>Market Strategist</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <h3>24/7</h3>
+        <p>Market Monitoring</p>
+      </div>
+      <div class="stat-card">
+        <h3>500+</h3>
+        <p>Tradable Assets</p>
+      </div>
+      <div class="stat-card">
+        <h3>0.1%</h3>
+        <p>Low Fees</p>
+      </div>
+      <div class="stat-card">
+        <h3>1M+</h3>
+        <p>Active Traders</p>
+      </div>
+    </div>
+
+    <!-- Risk Disclosure Section -->
+    <div class="risk-disclosure">
+      <h3><i class="fas fa-exclamation-triangle"></i> Risk Disclosure</h3>
+      <p>Trading carries a high level of risk and may not be suitable for all investors. The high degree of leverage can work against you as well as for you.</p>
+      <p>Before deciding to trade you should carefully consider your investment objectives, level of experience, and risk appetite. The possibility exists that you could sustain a loss of some or all of your initial investment.</p>
+      <p>Past performance is not indicative of future results. The information provided on this platform is for educational purposes only and does not constitute financial advice.</p>
+      <p>ProTradeX does not provide investment advice. Always conduct your own research and consult with a qualified financial advisor before making any investment decisions.</p>
+    </div>
+
+    <div class="secondary-nav">
+      <a href="fees.html"><i class="fas fa-percentage"></i> Fees</a>
+      <a href="security.html"><i class="fas fa-shield-alt"></i> Security</a>
+      <a href="api.html"><i class="fas fa-code"></i> API</a>
+      <a href="education.html"><i class="fas fa-graduation-cap"></i> Education</a>
+      <a href="blog.html"><i class="fas fa-blog"></i> Blog</a>
+      <a href="support.html"><i class="fas fa-headset"></i> Support</a>
+    </div>
+
+    <h2>Supported Payment Methods</h2>
+    <div class="payment-methods">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" alt="Visa" class="payment-icon">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" alt="Mastercard" class="payment-icon">
+      <div class="wire-transfer">
+        <i class="fas fa-exchange-alt"></i>
+        <span>Wire Transfer</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- Support Floating Buttons -->
+  <div class="support-floating">
+    <div class="support-btn whatsapp" onclick="window.open('https://wa.me/YOUR_WHATSAPP_NUMBER', '_blank')">
+      <i class="fab fa-whatsapp"></i>
+      <span class="support-tooltip">Chat on WhatsApp</span>
+    </div>
+    <div class="support-btn telegram" onclick="window.open('https://t.me/YOUR_TELEGRAM_USERNAME', '_blank')">
+      <i class="fab fa-telegram"></i>
+      <span class="support-tooltip">Message on Telegram</span>
+    </div>
+    <div class="support-btn ai" id="openChatbot">
+      <i class="fas fa-robot"></i>
+      <span class="support-tooltip">AI Support Assistant</span>
+    </div>
+  </div>
+
+  <!-- AI Chatbot Container -->
+  <div class="chatbot-container" id="chatbotContainer">
+    <div class="chatbot-header">
+      <h3>AI Trading Assistant</h3>
+      <button class="chatbot-close" id="closeChatbot">&times;</button>
+    </div>
+    <div class="chatbot-messages" id="chatbotMessages">
+      <div class="message bot-message">
+        Hello! I'm your AI trading assistant. How can I help you today?
+      </div>
+    </div>
+    <div class="chatbot-input">
+      <input type="text" id="userInput" placeholder="Type your question...">
+      <button id="sendMessage">Send</button>
+    </div>
+  </div>
+
+  <footer>
+    <div class="social-links">
+      <a href="#"><i class="fab fa-twitter"></i></a>
+      <a href="#"><i class="fab fa-telegram"></i></a>
+      <a href="#"><i class="fab fa-discord"></i></a>
+      <a href="#"><i class="fab fa-youtube"></i></a>
+      <a href="#"><i class="fab fa-linkedin"></i></a>
+    </div>
+    &copy; 2023 ProTradeX. All rights reserved.
+  </footer>
+
+  <script>
+    // Theme Toggle
+    const themeToggleBtn = document.querySelector('.theme-toggle');
+    themeToggleBtn.addEventListener('click', () => {
+      const currentTheme = document.body.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      document.body.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+
+      // Update icon
+      const icon = themeToggleBtn.querySelector('i');
+      icon.className = newTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+    });
+
+    // Set initial theme
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.body.setAttribute('data-theme', savedTheme);
+    const icon = themeToggleBtn.querySelector('i');
+    icon.className = savedTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+
+    // Set active nav link
+    const links = document.querySelectorAll('nav ul li a');
+    links.forEach(link => {
+      if (link.href === location.href) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+
+    // Create Japanese candlestick background
+    const candlestickChart = document.getElementById('candlestickChart');
+    for (let i = 0; i < 50; i++) {
+      const candle = document.createElement('div');
+      candle.className = 'candlestick ' + (Math.random() > 0.5 ? 'up' : 'down');
+      candle.style.left = `${Math.random() * 100}%`;
+      candle.style.height = `${50 + Math.random() * 150}px`;
+      candle.style.animationDelay = `${Math.random() * 10}s`;
+      candlestickChart.appendChild(candle);
+    }
+
+    // Create floating crypto coins
+    const floatingCoins = document.getElementById('floatingCoins');
+    const cryptoIcons = [
+      'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
+      'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+      'https://cryptologos.cc/logos/solana-sol-logo.png',
+      'https://cryptologos.cc/logos/cardano-ada-logo.png',
+      'https://cryptologos.cc/logos/binance-coin-bnb-logo.png',
+      'https://cryptologos.cc/logos/ripple-xrp-logo.png',
+      'https://cryptologos.cc/logos/dogecoin-doge-logo.png',
+      'https://cryptologos.cc/logos/polkadot-new-dot-logo.png'
+    ];
+
+    for (let i = 0; i < 15; i++) {
+      const coin = document.createElement('div');
+      coin.className = 'floating-coin';
+      coin.style.backgroundImage = `url(${cryptoIcons[Math.floor(Math.random() * cryptoIcons.length)]})`;
+      coin.style.left = `${Math.random() * 100}%`;
+      coin.style.animationDelay = `${Math.random() * 15}s`;
+      coin.style.animationDuration = `${15 + Math.random() * 30}s`;
+      floatingCoins.appendChild(coin);
+    }
+
+    // Market Data Ticker with Bubble Effect
+    async function loadMarketData() {
+      const tickerContainer = document.getElementById('tickerContainer');
+      const assetsGrid = document.getElementById('assetsGrid');
+
+      try {
+        // Simulated market data (in a real app, you'd fetch from APIs)
+        const marketData = {
+          crypto: [
+            { symbol: 'BTC', name: 'Bitcoin', price: 29345.67, change: 1.23, icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png' },
+            { symbol: 'ETH', name: 'Ethereum', price: 1856.42, change: -0.56, icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.png' },
+            { symbol: 'SOL', name: 'Solana', price: 24.89, change: 3.45, icon: 'https://cryptologos.cc/logos/solana-sol-logo.png' },
+            { symbol: 'ADA', name: 'Cardano', price: 0.29, change: -1.12, icon: 'https://cryptologos.cc/logos/cardano-ada-logo.png' },
+            { symbol: 'BNB', name: 'Binance Coin', price: 245.67, change: 0.89, icon: 'https://cryptologos.cc/logos/binance-coin-bnb-logo.png' },
+            { symbol: 'XRP', name: 'Ripple', price: 0.52, change: -0.23, icon: 'https://cryptologos.cc/logos/ripple-xrp-logo.png' },
+            { symbol: 'DOGE', name: 'Dogecoin', price: 0.078, change: 2.34, icon: 'https://cryptologos.cc/logos/dogecoin-doge-logo.png' },
+            { symbol: 'DOT', name: 'Polkadot', price: 5.23, change: -0.67, icon: 'https://cryptologos.cc/logos/polkadot-new-dot-logo.png' }
+          ],
+          'stocks-us': [
+            { symbol: 'AAPL', name: 'Apple Inc.', price: 189.37, change: 0.78, icon: 'https://logo.clearbit.com/apple.com' },
+            { symbol: 'TSLA', name: 'Tesla Inc.', price: 260.54, change: -2.34, icon: 'https://logo.clearbit.com/tesla.com' },
+            { symbol: 'AMZN', name: 'Amazon.com', price: 128.45, change: 1.12, icon: 'https://logo.clearbit.com/amazon.com' },
+            { symbol: 'MSFT', name: 'Microsoft', price: 328.39, change: 0.45, icon: 'https://logo.clearbit.com/microsoft.com' },
+            { symbol: 'GOOGL', name: 'Alphabet', price: 135.25, change: 0.67, icon: 'https://logo.clearbit.com/google.com' },
+            { symbol: 'META', name: 'Meta', price: 298.76, change: -1.23, icon: 'https://logo.clearbit.com/meta.com' },
+            { symbol: 'NVDA', name: 'NVIDIA', price: 467.50, change: 3.45, icon: 'https://logo.clearbit.com/nvidia.com' },
+            { symbol: 'JPM', name: 'JPMorgan Chase', price: 156.78, change: -0.89, icon: 'https://logo.clearbit.com/jpmorganchase.com' }
+          ],
+          'stocks-eu': [
+            { symbol: 'ASML', name: 'ASML Holding', price: 672.50, change: 1.23, icon: 'https://logo.clearbit.com/asml.com' },
+            { symbol: 'SAP', name: 'SAP SE', price: 132.75, change: -0.45, icon: 'https://logo.clearbit.com/sap.com' },
+            { symbol: 'LVMH', name: 'LVMH', price: 850.60, change: 0.89, icon: 'https://logo.clearbit.com/lvmh.com' },
+            { symbol: 'NESN', name: 'Nestlé', price: 110.25, change: -0.12, icon: 'https://logo.clearbit.com/nestle.com' },
+            { symbol: 'SIEGY', name: 'Siemens', price: 75.40, change: 0.34, icon: 'https://logo.clearbit.com/siemens.com' },
+            { symbol: 'HSBA', name: 'HSBC', price: 645.20, change: -0.78, icon: 'https://logo.clearbit.com/hsbc.com' },
+            { symbol: 'BMW', name: 'BMW', price: 98.50, change: 1.12, icon: 'https://logo.clearbit.com/bmw.com' },
+            { symbol: 'AIR', name: 'Airbus', price: 134.75, change: -0.45, icon: 'https://logo.clearbit.com/airbus.com' }
+          ],
+          commodities: [
+            { symbol: 'XAU', name: 'Gold', price: 1954.30, change: 0.34, icon: 'https://cdn-icons-png.flaticon.com/512/2583/2583344.png' },
+            { symbol: 'XAG', name: 'Silver', price: 24.56, change: -0.78, icon: 'https://cdn-icons-png.flaticon.com/512/2583/2583439.png' },
+            { symbol: 'CL', name: 'Crude Oil', price: 78.45, change: 1.23, icon: 'https://cdn-icons-png.flaticon.com/512/3174/3174836.png' },
+            { symbol: 'NG', name: 'Natural Gas', price: 2.67, change: -0.45, icon: 'https://cdn-icons-png.flaticon.com/512/3174/3174836.png' },
+            { symbol: 'XCU', name: 'Copper', price: 3.78, change: 0.56, icon: 'https://cdn-icons-png.flaticon.com/512/2583/2583439.png' },
+            { symbol: 'XPT', name: 'Platinum', price: 985.60, change: -1.23, icon: 'https://cdn-icons-png.flaticon.com/512/2583/2583344.png' },
+            { symbol: 'XPD', name: 'Palladium', price: 1345.80, change: 2.34, icon: 'https://cdn-icons-png.flaticon.com/512/2583/2583439.png' },
+            { symbol: 'CORN', name: 'Corn', price: 5.67, change: -0.34, icon: 'https://cdn-icons-png.flaticon.com/512/2583/2583439.png' }
+          ]
+        };
+
+        // Update ticker with enhanced bubble effect
+        tickerContainer.innerHTML = '';
+
+        // Create multiple copies of the ticker items for seamless scrolling
+        for (let i = 0; i < 2; i++) {
+          Object.values(marketData).flat().forEach(asset => {
+            const tickerItem = document.createElement('div');
+            tickerItem.className = 'ticker-item';
+
+            const bubbleContainer = document.createElement('div');
+            bubbleContainer.className = 'bubble-container';
+
+            const priceElement = document.createElement('span');
+            priceElement.className = asset.change > 0 ? 'price-up' : 'price-down';
+            priceElement.textContent = `$${asset.price.toLocaleString()}`;
+
+            const bubbleElement = document.createElement('div');
+            bubbleElement.className = `price-bubble ${asset.change > 0 ? 'up' : 'down'}`;
+            bubbleElement.innerHTML = `
+              <div><strong>${asset.name}</strong></div>
+              <div>24h: ${asset.change > 0 ? '+' : ''}${asset.change.toFixed(2)}%</div>
+              <div>Price: $${asset.price.toLocaleString()}</div>
+            `;
+
+            bubbleContainer.innerHTML = `
+              ${asset.symbol}:
+              <span class="${asset.change > 0 ? 'price-up' : 'price-down'}">$${asset.price.toLocaleString()}</span>
+            `;
+            bubbleContainer.appendChild(bubbleElement);
+            tickerItem.appendChild(bubbleContainer);
+            tickerContainer.appendChild(tickerItem);
+          });
+        }
+
+        // Update assets grid with crypto by default
+        updateAssetsGrid(marketData.crypto);
+
+        // Tab switching
+        const tabs = document.querySelectorAll('.asset-tab');
+        tabs.forEach(tab => {
+          tab.addEventListener('click', function() {
+            tabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            const category = this.getAttribute('data-category');
+            updateAssetsGrid(marketData[category]);
+          });
+        });
+
+      } catch (err) {
+        tickerContainer.innerHTML = "<span class='ticker-item'>Error loading market data. Please refresh.</span>";
+        console.error(err);
+      }
+    }
+
+    function updateAssetsGrid(assets) {
+      const assetsGrid = document.getElementById('assetsGrid');
+      assetsGrid.innerHTML = assets.map(asset => `
+        <div class="asset-card">
+          <div class="asset-header">
+            <img src="${asset.icon}" alt="${asset.name}" onerror="this.style.display='none'">
+            <div>
+              <div class="asset-name">${asset.name}</div>
+              <div class="asset-symbol">${asset.symbol}</div>
+            </div>
+          </div>
+          <div class="asset-price">$${asset.price.toLocaleString()}</div>
+          <div class="asset-change ${asset.change > 0 ? 'positive' : 'negative'}">
+            ${asset.change > 0 ? '+' : ''}${asset.change.toFixed(2)}%
+          </div>
+          <div class="asset-actions">
+            <button class="buy-btn">Buy</button>
+            <button class="sell-btn">Sell</button>
+          </div>
+        </div>
+      `).join('');
+
+      // Add buy/sell functionality
+      document.querySelectorAll('.buy-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const assetCard = this.closest('.asset-card');
+          const assetName = assetCard.querySelector('.asset-name').textContent;
+          alert(`Buy ${assetName} - Coming soon!`);
+        });
+      });
+
+      document.querySelectorAll('.sell-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const assetCard = this.closest('.asset-card');
+          const assetName = assetCard.querySelector('.asset-name').textContent;
+          alert(`Sell ${assetName} - Coming soon!`);
+        });
+      });
+    }
+
+    // Initial load
+    loadMarketData();
+    // Refresh every 30 seconds
+    setInterval(loadMarketData, 30000);
+
+    // AI Chatbot Functionality
+    const chatbotContainer = document.getElementById('chatbotContainer');
+    const openChatbot = document.getElementById('openChatbot');
+    const closeChatbot = document.getElementById('closeChatbot');
+    const chatbotMessages = document.getElementById('chatbotMessages');
+    const userInput = document.getElementById('userInput');
+    const sendMessage = document.getElementById('sendMessage');
+
+    openChatbot.addEventListener('click', () => {
+      chatbotContainer.classList.add('open');
+    });
+
+    closeChatbot.addEventListener('click', () => {
+      chatbotContainer.classList.remove('open');
+    });
+
+    // Simple AI responses
+    const aiResponses = {
+      "hello": "Hello! How can I assist you with your trading today?",
+      "hi": "Hi there! What would you like to know about our trading platform?",
+      "fees": "Our trading fees start at just 0.1% per trade. Premium accounts get even lower rates!",
+      "account": "You can create an account by clicking on 'Register' in the top menu.",
+      "withdraw": "Withdrawals are processed within 24 hours. Fiat withdrawals go to your linked bank account.",
+      "contact": "You can reach our support team via WhatsApp, Telegram, or email at support@protradex.com",
+      "risk": "Trading carries significant risk. Please see our Risk Disclosure section for more information.",
+      "default": "I'm sorry, I didn't understand that. Could you please rephrase your question? For account-specific questions, please contact our support team directly."
+    };
+
+    function addBotMessage(text) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message bot-message';
+      messageDiv.textContent = text;
+      chatbotMessages.appendChild(messageDiv);
+      chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+
+    function addUserMessage(text) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message user-message';
+      messageDiv.textContent = text;
+      chatbotMessages.appendChild(messageDiv);
+      chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+
+    function processUserInput() {
+      const text = userInput.value.trim().toLowerCase();
+      if (text === '') return;
+
+      addUserMessage(text);
+      userInput.value = '';
+
+      // Simulate AI thinking
+      setTimeout(() => {
+        let response = aiResponses.default;
+        for (const [key, value] of Object.entries(aiResponses)) {
+          if (text.includes(key)) {
+            response = value;
+            break;
+          }
+        }
+        addBotMessage(response);
+      }, 1000);
+    }
+
+    sendMessage.addEventListener('click', processUserInput);
+    userInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') processUserInput();
+    });
+
+    // Initialize with welcome message
+    setTimeout(() => {
+      addBotMessage("Welcome to ProTradeX! I can help with questions about trading, accounts, fees, and more. Try asking 'What are your fees?' or 'How do I create an account?'");
+    }, 1500);
+  </script>
+</body>
+</html>

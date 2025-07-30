@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ProBTC — About Us</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-color: #0a0a0a;
+      --text-color: #fff;
+      --card-bg: #111;
+      --accent: #ff6600;
+    }
+    [data-theme="light"] {
+      --bg-color: #f2f2f2;
+      --text-color: #111;
+      --card-bg: #fff;
+      --accent: #ff6600;
+    }
+    * {
+      margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth;
+    }
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      line-height: 1.6;
+      padding-top: 70px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    nav {
+      position: fixed;
+      top: 0; width: 100%;
+      background: var(--card-bg);
+      border-bottom: 2px solid var(--accent);
+      padding: 1rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 999;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+    nav .logo {
+      font-weight: 700;
+      font-size: 1.75rem;
+      color: var(--accent);
+      user-select: none;
+    }
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+    }
+    nav ul li a {
+      color: var(--text-color);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    nav ul li a:hover,
+    nav ul li a.active {
+      background-color: var(--accent);
+      color: #000;
+      box-shadow: 0 0 8px var(--accent);
+    }
+    .theme-toggle {
+      background: transparent;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+      padding: 0.4rem 0.8rem;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .theme-toggle:hover {
+      background-color: var(--accent);
+      color: #000;
+      box-shadow: 0 0 8px var(--accent);
+    }
+    main {
+      max-width: 900px;
+      margin: 2rem auto 4rem;
+      padding: 0 1rem;
+      text-align: center;
+    }
+    h1 {
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+<nav>
+  <div class="logo">ProBTC</div>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="account-types.html">Account Types</a></li>
+    <li><a href="charts.html">Charts</a></li>
+    <li><a href="contact.html">Contact Us</a></li>
+    <li><a href="about.html">About Us</a></li>
+  </ul>
+  <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+</nav>
+
+
+  <main>
+    <h1>About ProBTC</h1>
+    <p>ProBTC is a leading cryptocurrency trading platform dedicated to providing professional, reliable, and up-to-date market data and tools for traders of all levels.</p>
+    <p>Our mission is to empower traders worldwide with intuitive charts, real-time prices, and flexible account types to match their trading needs.</p>
+    <p>With our signature orange and black theme, we combine aesthetics with functionality to deliver an outstanding user experience.</p>
+  </main>
+
+  <script>
+    // Theme toggle & persistence
+    const themeToggleBtn = document.querySelector('.theme-toggle');
+    themeToggleBtn.addEventListener('click', () => {
+      const currentTheme = document.body.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      document.body.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    });
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.body.setAttribute('data-theme', savedTheme);
+
+    // Highlight active nav link
+    const links = document.querySelectorAll('nav ul li a');
+    links.forEach(link => {
+      if (link.href === location.href) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+  </script>
+
+</body>
+</html>

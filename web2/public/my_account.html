@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ProTradeX — Trading Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- TradingView Widget -->
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+  <style>
+    :root {
+      --bg-color: #0a0a0a;
+      --text-color: #fff;
+      --card-bg: #111;
+      --accent: #ff6600;
+      --accent-light: #ff8c42;
+      --positive: #00c853;
+      --negative: #ff3d00;
+      --border-color: rgba(255,255,255,0.1);
+    }
+    [data-theme="light"] {
+      --bg-color: #f2f2f2;
+      --text-color: #111;
+      --card-bg: #fff;
+      --accent: #ff6600;
+      --accent-light: #ff8c42;
+      --positive: #00a344;
+      --negative: #d32f2f;
+      --border-color: rgba(0,0,0,0.1);
+    }
+    * {
+      margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth;
+    }
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      line-height: 1.6;
+      transition: background-color 0.3s, color 0.3s;
+      overflow-x: hidden;
+    }
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      background: rgba(17, 17, 17, 0.95);
+      border-bottom: 2px solid var(--accent);
+      padding: 1rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 999;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+    }
+    nav .logo {
+      font-weight: 700;
+      font-size: 1.75rem;
+      color: var(--accent);
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    nav .logo i {
+      font-size: 1.5rem;
+    }
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+    }
+    nav ul li a {
+      color: var(--text-color);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
+    nav ul li a:hover,
+    nav ul li a.active {
+      background-color: var(--accent);
+      color: #000;
+      box-shadow: 0 0 15px var(--accent);
+      transform: translateY(-2px);
+    }
+    .theme-toggle {
+      background: transparent;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .theme-toggle:hover {
+      background-color: var(--accent);
+      color: #000;
+      box-shadow: 0 0 15px var(--accent);
+    }
+    main {
+      max-width: 1800px;
+      margin: 6rem auto 4rem;
+      padding: 2.5rem;
+      background-color: rgba(17, 17, 17, 0.8);
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(255, 102, 0, 0.4);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,102,0,0.2);
+    }
+    h1 {
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      font-size: 2.5rem;
+      text-shadow: 0 0 15px rgba(255, 102, 0, 0.5);
+      font-weight: 700;
+    }
+    h2 {
+      color: var(--accent);
+      margin: 2rem 0;
+      font-size: 2rem;
+      font-weight: 600;
+    }
+    h3 {
+      color: var(--accent);
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      color: #ddd;
+    }
+
+    /* Dashboard Layout */
+    .dashboard {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    @media (max-width: 1200px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: rgba(255, 102, 0, 0.05);
+      border-radius: 15px;
+      padding: 1.5rem;
+      border: 1px solid rgba(255, 102, 0, 0.2);
+      height: fit-content;
+    }
+    .sidebar-section {
+      margin-bottom: 2rem;
+    }
+    .sidebar-section h3 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sidebar-section h3 i {
+      font-size: 1.1rem;
+      color: var(--accent);
+    }
+    .asset-list {
+      list-style: none;
+    }
+    .asset-item {
+      padding: 0.8rem 0;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .asset-item:hover {
+      color: var(--accent);
+    }
+    .asset-item.active {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .asset-price {
+      font-weight: 500;
+    }
+    .asset-change {
+      font-size: 0.9rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+    .asset-change.positive {
+      background: rgba(0, 200, 83, 0.15);
+      color: var(--positive);
+    }
+    .asset-change.negative {
+      background: rgba(255, 61, 0, 0.15);
+      color: var(--negative);
+    }
+
+    /* Main Content */
+    .content {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 2rem;
+    }
+
+    /* Portfolio Summary */
+    .portfolio-summary {
+      background: rgba(17, 17, 17, 0.7);
+      border-radius: 15px;
+      padding: 1.5rem;
+      border: 1px solid rgba(255, 102, 0, 0.2);
+    }
+    .portfolio-stats {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .stat-card {
+      flex: 1;
+      min-width: 200px;
+      background: rgba(255, 102, 0, 0.05);
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid rgba(255, 102, 0, 0.2);
+    }
+    .stat-card h4 {
+      font-size: 1rem;
+      color: #aaa;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    .balance {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-color);
+      margin-bottom: 0.25rem;
+    }
+    .profit {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    .change {
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      display: inline-block;
+    }
+    .positive {
+      background: rgba(0, 200, 83, 0.15);
+      color: var(--positive);
+    }
+    .negative {
+      background: rgba(255, 61, 0, 0.15);
+      color: var(--negative);
+    }
+
+    /* Trading View */
+    .trading-view {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 1.5rem;
+      height: 600px;
+    }
+    @media (max-width: 1400px) {
+      .trading-view {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+    }
+    .chart-container {
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      border: 1px solid rgba(255,102,0,0.3);
+      height: 100%;
+      min-height: 500px;
+    }
+    .order-panel {
+      background: rgba(17, 17, 17, 0.7);
+      border-radius: 15px;
+      padding: 1.5rem;
+      border: 1px solid rgba(255, 102, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+    }
+    .order-tabs {
+      display: flex;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .order-tab {
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-weight: 600;
+      color: #aaa;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s;
+    }
+    .order-tab.active {
+      color: var(--accent);
+      border-bottom: 2px solid var(--accent);
+    }
+    .order-form {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-row {
+      display: flex;
+      gap: 1.5rem;
+    }
+    .form-row .form-group {
+      flex: 1;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #ddd;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-color);
+      font-family: 'Inter', sans-serif;
+      transition: all 0.3s;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(255, 102, 0, 0.2);
+    }
+    button {
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn {
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      color: #000;
+      font-weight: 600;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 102, 0, 0.3);
+    }
+    .btn-secondary {
+      background: rgba(255, 102, 0, 0.1);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+    .btn-buy {
+      background: linear-gradient(135deg, var(--positive), #66ffa3);
+      color: #000;
+    }
+    .btn-sell {
+      background: linear-gradient(135deg, var(--negative), #ff8a65);
+      color: #000;
+    }
+    .order-book {
+      margin-top: 1.5rem;
+      flex: 1;
+      overflow-y: auto;
+    }
+    .order-book table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .order-book th {
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.5rem;
+      text-align: right;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .order-book th:first-child {
+      text-align: left;
+    }
+    .order-book td {
+      padding: 0.5rem;
+      text-align: right;
+      font-size: 0.9rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .order-book td:first-child {
+      text-align: left;
+    }
+    .bid {
+      color: var(--positive);
+    }
+    .ask {
+      color: var(--negative);
+    }
+
+    /* Positions Table */
+    .positions-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.5rem;
+    }
+    .positions-table th {
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .positions-table td {
+      padding: 1rem;
+      text-align: left;
+      font-size: 0.95rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .close-btn {
+      background: rgba(255, 61, 0, 0.1);
+      color: var(--negative);
+      border: 1px solid var(--negative);
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .close-btn:hover {
+      background: rgba(255, 61, 0, 0.2);
+    }
+
+    /* Market News */
+    .market-news {
+      margin-top: 2rem;
+    }
+    .news-item {
+      padding: 1.5rem;
+      background: rgba(17, 17, 17, 0.7);
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(255, 102, 0, 0.2);
+    }
+    .news-item h4 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+    }
+    .news-item p {
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+      color: #ddd;
+    }
+    .news-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: #aaa;
+    }
+
+    /* Admin Panel */
+    .admin-panel {
+      display: none;
+      margin-top: 2rem;
+      background: rgba(17, 17, 17, 0.9);
+      border-radius: 15px;
+      padding: 2rem;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+    }
+    .admin-controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .admin-btn {
+      background: rgba(255, 0, 0, 0.1);
+      color: #ff5252;
+      border: 1px solid #ff5252;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .admin-btn:hover {
+      background: rgba(255, 0, 0, 0.2);
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(5px);
+    }
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: 15px;
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      border: 1px solid var(--accent);
+      box-shadow: 0 0 30px rgba(255, 102, 0, 0.3);
+      position: relative;
+    }
+    .close-modal {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #aaa;
+    }
+    .close-modal:hover {
+      color: var(--text-color);
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 992px) {
+      nav {
+        padding: 1rem;
+      }
+      nav ul {
+        gap: 1rem;
+      }
+      main {
+        padding: 1.5rem;
+        margin-top: 5rem;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      h2 {
+        font-size: 1.6rem;
+      }
+    }
+    @media (max-width: 768px) {
+      .portfolio-stats .stat-card {
+        min-width: 100%;
+      }
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+    }
+    @media (max-width: 576px) {
+      .trading-view {
+        grid-template-columns: 1fr;
+      }
+      .order-panel {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  <nav>
+    <div class="logo"><i class="fas fa-chart-line"></i>ProTradeX</div>
+    <ul>
+      <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+      <li><a href="#"><i class="fas fa-exchange-alt"></i> Trade</a></li>
+      <li><a href="#"><i class="fas fa-wallet"></i> Portfolio</a></li>
+      <li><a href="#"><i class="fas fa-history"></i> History</a></li>
+      <li><a href="#"><i class="fas fa-newspaper"></i> News</a></li>
+    </ul>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <div class="user-menu">
+        <button class="btn" style="padding: 0.5rem 1rem;">
+          <i class="fas fa-user-circle"></i> Account
+        </button>
+      </div>
+      <button class="theme-toggle" aria-label="Toggle Light/Dark Theme">
+        <i class="fas fa-moon"></i> Theme
+      </button>
+    </div>
+  </nav>
+
+  <main>
+    <h1><i class="fas fa-chart-line"></i> Trading Dashboard</h1>
+    <p>Welcome back! Track your portfolio and trade across multiple asset classes.</p>
+
+    <div class="dashboard">
+      <!-- Sidebar with asset lists -->
+      <div class="sidebar">
+        <div class="sidebar-section">
+          <h3><i class="fas fa-star"></i> Watchlist</h3>
+          <ul class="asset-list" id="watchlist">
+            <li class="asset-item active">
+              <span>BTC/USD</span>
+              <div>
+                <span class="asset-price">$42,850.32</span>
+                <span class="asset-change positive">+2.34%</span>
+              </div>
+            </li>
+            <li class="asset-item">
+              <span>ETH/USD</span>
+              <div>
+                <span class="asset-price">$2,345.67</span>
+                <span class="asset-change positive">+1.56%</span>
+              </div>
+            </li>
+            <li class="asset-item">
+              <span>SPX500</span>
+              <div>
+                <span class="asset-price">$4,567.89</span>
+                <span class="asset-change negative">-0.23%</span>
+              </div>
+            </li>
+            <li class="asset-item">
+              <span>Gold</span>
+              <div>
+                <span class="asset-price">$1,987.65</span>
+                <span class="asset-change positive">+0.45%</span>
+              </div>
+            </li>
+            <li class="asset-item">
+              <span>EUR/USD</span>
+              <div>
+                <span class="asset-price">1.0987</span>
+                <span class="asset-change negative">-0.12%</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="sidebar-section">
+          <h3><i class="fas fa-bolt"></i> Top Movers</h3>
+          <ul class="asset-list" id="top-movers">
+            <li class="asset-item">
+              <span>SOL/USD</span>
+              <div>
+                <span class="asset-price">$98.76</span>
+                <span class="asset-change positive">+5.67%</span>
+              </div>
+            </li>
+            <li class="asset-item">
+              <span>TSLA</span>
+              <div>
+                <span class="asset-price">$765.43</span>
+                <span class="asset-change negative">-3.21%</span>
+              </div>
+            </li>
+            <li class="asset-item">
+              <span>OIL</span>
+              <div>
+                <span class="asset-price">$78.90</span>
+                <span class="asset-change positive">+2.89%</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Main Content Area -->
+      <div class="content">
+        <!-- Portfolio Summary -->
+        <div class="portfolio-summary">
+          <h2><i class="fas fa-chart-pie"></i> Portfolio Summary</h2>
+
+          <div class="portfolio-stats">
+            <div class="stat-card">
+              <h4>Account Balance</h4>
+              <p class="balance">$24,568.42</p>
+              <p class="change positive">+3.2% today</p>
+            </div>
+
+            <div class="stat-card">
+              <h4>Open Positions</h4>
+              <p class="balance">5</p>
+              <p class="change negative">-1.5% today</p>
+            </div>
+
+            <div class="stat-card">
+              <h4>Available Margin</h4>
+              <p class="balance">$12,345.67</p>
+              <p>75% of balance</p>
+            </div>
+
+            <div class="stat-card">
+              <h4>Leverage</h4>
+              <p class="balance">1:10</p>
+              <p>Max 1:100</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trading View -->
+        <div class="trading-view">
+          <!-- Chart Container -->
+          <div class="chart-container" id="tradingview-chart"></div>
+
+          <!-- Order Panel -->
+          <div class="order-panel">
+            <div class="order-tabs">
+              <div class="order-tab active">Trade</div>
+              <div class="order-tab">Orders</div>
+              <div class="order-tab">Positions</div>
+            </div>
+
+            <div class="order-form">
+              <div class="form-group">
+                <label for="asset-pair">Asset Pair</label>
+                <select id="asset-pair">
+                  <option value="BTCUSD">BTC/USD</option>
+                  <option value="ETHUSD">ETH/USD</option>
+                  <option value="XRPUSD">XRP/USD</option>
+                  <option value="SPX500">SPX500</option>
+                  <option value="GOLD">Gold</option>
+                  <option value="EURUSD">EUR/USD</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="order-type">Order Type</label>
+                <select id="order-type">
+                  <option value="market">Market</option>
+                  <option value="limit">Limit</option>
+                  <option value="stop">Stop</option>
+                  <option value="stop-limit">Stop-Limit</option>
+                </select>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="order-amount">Amount</label>
+                  <input type="number" id="order-amount" placeholder="0.00">
+                </div>
+
+                <div class="form-group">
+                  <label for="order-price">Price</label>
+                  <input type="number" id="order-price" placeholder="Market Price" disabled>
+                </div>
+              </div>
+
+              <div class="form-group" id="limit-price-group" style="display: none;">
+                <label for="limit-price">Limit Price</label>
+                <input type="number" id="limit-price" placeholder="0.00">
+              </div>
+
+              <div class="form-group" id="stop-price-group" style="display: none;">
+                <label for="stop-price">Stop Price</label>
+                <input type="number" id="stop-price" placeholder="0.00">
+              </div>
+
+              <div class="form-group">
+                <label for="leverage">Leverage</label>
+                <select id="leverage">
+                  <option value="1">1x (No leverage)</option>
+                  <option value="5">5x</option>
+                  <option value="10" selected>10x</option>
+                  <option value="25">25x</option>
+                  <option value="50">50x</option>
+                  <option value="100">100x</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <div style="display: flex; gap: 1rem;">
+                  <button class="btn btn-buy" style="flex: 1;">
+                    <i class="fas fa-arrow-up"></i> Buy/Long
+                  </button>
+                  <button class="btn btn-sell" style="flex: 1;">
+                    <i class="fas fa-arrow-down"></i> Sell/Short
+                  </button>
+                </div>
+              </div>
+
+              <div class="order-book">
+                <h4>Order Book</h4>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Price (USD)</th>
+                      <th>Amount</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="ask">42,860.50</td>
+                      <td>0.245</td>
+                      <td>10,500.82</td>
+                    </tr>
+                    <tr>
+                      <td class="ask">42,858.75</td>
+                      <td>0.180</td>
+                      <td>7,714.58</td>
+                    </tr>
+                    <tr>
+                      <td class="ask">42,855.20</td>
+                      <td>1.500</td>
+                      <td>64,282.80</td>
+                    </tr>
+                    <tr style="height: 20px;">
+                      <td colspan="3" style="text-align: center; color: var(--accent); font-weight: 600;">$42,850.32</td>
+                    </tr>
+                    <tr>
+                      <td class="bid">42,845.10</td>
+                      <td>0.750</td>
+                      <td>32,133.83</td>
+                    </tr>
+                    <tr>
+                      <td class="bid">42,840.25</td>
+                      <td>1.200</td>
+                      <td>51,408.30</td>
+                    </tr>
+                    <tr>
+                      <td class="bid">42,835.60</td>
+                      <td>0.500</td>
+                      <td>21,417.80</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Open Positions -->
+        <div style="margin-top: 2rem;">
+          <h2><i class="fas fa-chart-bar"></i> Open Positions</h2>
+
+          <table class="positions-table">
+            <thead>
+              <tr>
+                <th>Asset</th>
+                <th>Type</th>
+                <th>Size</th>
+                <th>Entry Price</th>
+                <th>Current Price</th>
+                <th>P/L</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>BTC/USD</td>
+                <td>Long</td>
+                <td>0.5 BTC</td>
+                <td>$41,200.50</td>
+                <td>$42,850.32</td>
+                <td class="positive">+$824.91 (+4.0%)</td>
+                <td><button class="close-btn"><i class="fas fa-times"></i> Close</button></td>
+              </tr>
+              <tr>
+                <td>ETH/USD</td>
+                <td>Short</td>
+                <td>2 ETH</td>
+                <td>$2,400.75</td>
+                <td>$2,345.67</td>
+                <td class="positive">+$110.16 (+2.3%)</td>
+                <td><button class="close-btn"><i class="fas fa-times"></i> Close</button></td>
+              </tr>
+              <tr>
+                <td>SPX500</td>
+                <td>Long</td>
+                <td>1 contract</td>
+                <td>$4,550.20</td>
+                <td>$4,567.89</td>
+                <td class="positive">+$17.69 (+0.4%)</td>
+                <td><button class="close-btn"><i class="fas fa-times"></i> Close</button></td>
+              </tr>
+              <tr>
+                <td>EUR/USD</td>
+                <td>Short</td>
+                <td>10,000 units</td>
+                <td>1.1025</td>
+                <td>1.0987</td>
+                <td class="positive">+$34.48 (+0.3%)</td>
+                <td><button class="close-btn"><i class="fas fa-times"></i> Close</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Market News -->
+        <div class="market-news">
+          <h2><i class="fas fa-newspaper"></i> Market News</h2>
+
+          <div class="news-item">
+            <h4>Bitcoin Surges Past $42,000 as Institutional Interest Grows</h4>
+            <p>Bitcoin has broken through the $42,000 resistance level amid increasing institutional adoption and positive regulatory developments...</p>
+            <div class="news-meta">
+              <span>CoinDesk</span>
+              <span>2 hours ago</span>
+            </div>
+          </div>
+
+          <div class="news-item">
+            <h4>Fed Signals Potential Rate Cuts in 2024, Dollar Weakens</h4>
+            <p>The Federal Reserve has indicated it may begin cutting interest rates next year, leading to a sell-off in the US dollar across major currency pairs...</p>
+            <div class="news-meta">
+              <span>Bloomberg</span>
+              <span>5 hours ago</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Admin Panel (Hidden by default) -->
+        <div class="admin-panel" id="admin-panel">
+          <h2><i class="fas fa-user-shield"></i> Admin Control Panel</h2>
+
+          <div class="admin-controls">
+            <button class="admin-btn"><i class="fas fa-users"></i> Manage Users</button>
+            <button class="admin-btn"><i class="fas fa-exchange-alt"></i> Adjust Trades</button>
+            <button class="admin-btn"><i class="fas fa-chart-line"></i> Price Control</button>
+            <button class="admin-btn"><i class="fas fa-file-export"></i> Generate Reports</button>
+          </div>
+
+          <div class="form-group">
+            <label for="admin-user-select">Select User</label>
+            <select id="admin-user-select">
+              <option value="">Select a user...</option>
+              <option value="user1">John Doe (john@example.com)</option>
+              <option value="user2">Jane Smith (jane@example.com)</option>
+              <option value="user3">Bob Johnson (bob@example.com)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="admin-trade-select">Select Trade</label>
+            <select id="admin-trade-select" disabled>
+              <option value="">Select a user first</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="admin-entry-price">Entry Price</label>
+              <input type="number" id="admin-entry-price" placeholder="Original entry price" disabled>
+            </div>
+
+            <div class="form-group">
+              <label for="admin-new-price">New Price</label>
+              <input type="number" id="admin-new-price" placeholder="Set new price" disabled>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div style="display: flex; gap: 1rem;">
+              <button class="admin-btn" style="flex: 1;" disabled>
+                <i class="fas fa-save"></i> Update Trade
+              </button>
+              <button class="admin-btn" style="flex: 1;" disabled>
+                <i class="fas fa-times"></i> Close Trade
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Trade Confirmation Modal -->
+  <div class="modal" id="trade-modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h3><i class="fas fa-check-circle"></i> Trade Confirmation</h3>
+
+      <div style="margin: 1.5rem 0;">
+        <p>You are about to place the following order:</p>
+
+        <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span>Asset:</span>
+            <strong id="confirm-asset">BTC/USD</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span>Type:</span>
+            <strong id="confirm-type">Buy Market</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span>Amount:</span>
+            <strong id="confirm-amount">0.5 BTC</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span>Estimated Price:</span>
+            <strong id="confirm-price">$42,850.32</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span>Leverage:</span>
+            <strong id="confirm-leverage">10x</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span>Margin:</span>
+            <strong id="confirm-margin">$2,142.52</strong>
+          </div>
+        </div>
+
+        <p style="font-size: 0.9rem; color: #aaa;">
+          <i class="fas fa-exclamation-triangle"></i> Trading leveraged products carries significant risk of loss.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 1rem;">
+        <button class="btn btn-secondary" style="flex: 1;">
+          Cancel
+        </button>
+        <button class="btn" style="flex: 1;" id="confirm-trade">
+          <i class="fas fa-check"></i> Confirm Trade
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Position Close Modal -->
+  <div class="modal" id="close-modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h3><i class="fas fa-times-circle"></i> Close Position</h3>
+
+      <div style="margin: 1.5rem 0;">
+        <p>You are about to close the following position:</p>
+
+        <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span>Asset:</span>
+            <strong id="close-asset">BTC/USD</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span>Type:</span>
+            <strong id="close-type">Long</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span>Size:</span>
+            <strong id="close-size">0.5 BTC</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span>Entry Price:</span>
+            <strong id="close-entry">$41,200.50</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span>Current Price:</span>
+            <strong id="close-current">$42,850.32</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span>P/L:</span>
+            <strong id="close-pl" class="positive">+$824.91 (+4.0%)</strong>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 1rem;">
+        <button class="btn btn-secondary" style="flex: 1;">
+          Cancel
+        </button>
+        <button class="btn" style="flex: 1;" id="confirm-close">
+          <i class="fas fa-check"></i> Close Position
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Theme Toggle
+    const themeToggleBtn = document.querySelector('.theme-toggle');
+    themeToggleBtn.addEventListener('click', () => {
+      const currentTheme = document.body.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      document.body.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+
+      // Update icon
+      const icon = themeToggleBtn.querySelector('i');
+      icon.className = newTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+
+      // Update TradingView theme
+      if (window.tvWidget) {
+        window.tvWidget.setTheme(newTheme);
+      }
+    });
+
+    // Set initial theme
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.body.setAttribute('data-theme', savedTheme);
+    const icon = themeToggleBtn.querySelector('i');
+    icon.className = savedTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+
+    // Initialize TradingView Widget
+    function initTradingView() {
+      window.tvWidget = new TradingView.widget({
+        "autosize": true,
+        "symbol": "BITSTAMP:BTCUSD",
+        "interval": "D",
+        "timezone": "Etc/UTC",
+        "theme": savedTheme,
+        "style": "1",
+        "locale": "en",
+        "toolbar_bg": "#f1f3f6",
+        "enable_publishing": false,
+        "hide_top_toolbar": false,
+        "hide_side_toolbar": false,
+        "allow_symbol_change": true,
+        "container_id": "tradingview-chart",
+        "studies": [
+          "MACD@tv-basicstudies",
+          "RSI@tv-basicstudies",
+          "Volume@tv-basicstudies"
+        ]
+      });
+    }
+
+    // Order type toggle
+    document.getElementById('order-type').addEventListener('change', function() {
+      const type = this.value;
+      document.getElementById('limit-price-group').style.display =
+        (type === 'limit' || type === 'stop-limit') ? 'block' : 'none';
+      document.getElementById('stop-price-group').style.display =
+        (type === 'stop' || type === 'stop-limit') ? 'block' : 'none';
+
+      if (type === 'market') {
+        document.getElementById('order-price').placeholder = 'Market Price';
+        document.getElementById('order-price').disabled = true;
+      } else {
+        document.getElementById('order-price').placeholder = '0.00';
+        document.getElementById('order-price').disabled = false;
+      }
+    });
+
+    // Asset pair change
+    document.getElementById('asset-pair').addEventListener('change', function() {
+      const pair = this.value;
+      let symbol = 'BITSTAMP:BTCUSD';
+
+      switch(pair) {
+        case 'ETHUSD':
+          symbol = 'BITSTAMP:ETHUSD';
+          break;
+        case 'XRPUSD':
+          symbol = 'BITSTAMP:XRPUSD';
+          break;
+        case 'SPX500':
+          symbol = 'SP:SPX';
+          break;
+        case 'GOLD':
+          symbol = 'TVC:GOLD';
+          break;
+        case 'EURUSD':
+          symbol = 'FX_IDC:EURUSD';
+          break;
+      }
+
+      if (window.tvWidget) {
+        window.tvWidget.chart().setSymbol(symbol);
+      }
+
+      // Update order book (simulated)
+      updateOrderBook(pair);
+    });
+
+    // Simulated order book data
+    function updateOrderBook(pair) {
+      // In a real app, this would fetch data from your API
+      console.log(`Updating order book for ${pair}`);
+    }
+
+    // Trade buttons
+    document.querySelector('.btn-buy').addEventListener('click', function() {
+      openTradeModal('buy');
+    });
+
+    document.querySelector('.btn-sell').addEventListener('click', function() {
+      openTradeModal('sell');
+    });
+
+    // Open trade confirmation modal
+    function openTradeModal(side) {
+      const pair = document.getElementById('asset-pair').value;
+      const type = document.getElementById('order-type').value;
+      const amount = document.getElementById('order-amount').value || '0';
+      const price = document.getElementById('order-price').value ||
+                   (type === 'market' ? 'Market' : '0');
+      const leverage = document.getElementById('leverage').value;
+
+      if (parseFloat(amount) <= 0) {
+        alert('Please enter a valid amount');
+        return;
+      }
+
+      // Update modal content
+      document.getElementById('confirm-asset').textContent = pair;
+      document.getElementById('confirm-type').textContent =
+        `${side === 'buy' ? 'Buy' : 'Sell'} ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+      document.getElementById('confirm-amount').textContent =
+        `${amount} ${pair.split('/')[0] || pair}`;
+      document.getElementById('confirm-price').textContent =
+        type === 'market' ? 'Market Price' : `$${price}`;
+      document.getElementById('confirm-leverage').textContent = `${leverage}x`;
+
+      // Calculate margin (simplified)
+      const margin = type === 'market' ?
+        (parseFloat(amount) * 42000 / parseInt(leverage)) :
+        (parseFloat(amount) * parseFloat(price) / parseInt(leverage));
+      document.getElementById('confirm-margin').textContent = `$${margin.toFixed(2)}`;
+
+      // Show modal
+      document.getElementById('trade-modal').style.display = 'flex';
+    }
+
+    // Close position buttons
+    document.querySelectorAll('.close-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const row = this.closest('tr');
+        const asset = row.cells[0].textContent;
+        const type = row.cells[1].textContent;
+        const size = row.cells[2].textContent;
+        const entry = row.cells[3].textContent;
+        const current = row.cells[4].textContent;
+        const pl = row.cells[5].textContent;
+
+        // Update modal
+        document.getElementById('close-asset').textContent = asset;
+        document.getElementById('close-type').textContent = type;
+        document.getElementById('close-size').textContent = size;
+        document.getElementById('close-entry').textContent = entry;
+        document.getElementById('close-current').textContent = current;
+        document.getElementById('close-pl').textContent = pl;
+        document.getElementById('close-pl').className = row.cells[5].className;
+
+        // Show modal
+        document.getElementById('close-modal').style.display = 'flex';
+      });
+    });
+
+    // Confirm trade
+    document.getElementById('confirm-trade').addEventListener('click', function() {
+      // In a real app, this would send the order to your API
+      alert('Order executed successfully!');
+      document.getElementById('trade-modal').style.display = 'none';
+
+      // Reset form
+      document.getElementById('order-amount').value = '';
+    });
+
+    // Confirm close
+    document.getElementById('confirm-close').addEventListener('click', function() {
+      // In a real app, this would close the position via API
+      alert('Position closed successfully!');
+      document.getElementById('close-modal').style.display = 'none';
+    });
+
+    // Close modals when clicking X
+    document.querySelectorAll('.close-modal').forEach(btn => {
+      btn.addEventListener('click', function() {
+        this.closest('.modal').style.display = 'none';
+      });
+    });
+
+    // Close modals when clicking outside
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('click', function(e) {
+        if (e.target === this) {
+          this.style.display = 'none';
+        }
+      });
+    });
+
+    // Watchlist item click
+    document.querySelectorAll('.asset-item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.querySelectorAll('.asset-item').forEach(i => {
+          i.classList.remove('active');
+        });
+        this.classList.add('active');
+
+        const asset = this.querySelector('span').textContent;
+        document.getElementById('asset-pair').value = asset;
+
+        // Update chart
+        let symbol = 'BITSTAMP:BTCUSD';
+        if (asset.includes('ETH')) symbol = 'BITSTAMP:ETHUSD';
+        if (asset.includes('XRP')) symbol = 'BITSTAMP:XRPUSD';
+        if (asset.includes('SPX')) symbol = 'SP:SPX';
+        if (asset.includes('Gold')) symbol = 'TVC:GOLD';
+        if (asset.includes('EUR')) symbol = 'FX_IDC:EURUSD';
+
+        if (window.tvWidget) {
+          window.tvWidget.chart().setSymbol(symbol);
+        }
+      });
+    });
+
+    // Admin toggle (for demo purposes)
+    document.addEventListener('keydown', function(e) {
+      if (e.ctrlKey && e.key === 'a') {
+        const adminPanel = document.getElementById('admin-panel');
+        adminPanel.style.display = adminPanel.style.display === 'none' ? 'block' : 'none';
+      }
+    });
+
+    // Initialize
+    window.addEventListener('load', function() {
+      initTradingView();
+
+      // Simulate real-time price updates
+      setInterval(() => {
+        const watchlistItems = document.querySelectorAll('#watchlist .asset-item');
+        watchlistItems.forEach(item => {
+          const priceElement = item.querySelector('.asset-price');
+          const changeElement = item.querySelector('.asset-change');
+
+          if (priceElement && changeElement) {
+            const currentPrice = parseFloat(priceElement.textContent.replace(/[^0-9.]/g, ''));
+            const changePercent = parseFloat(changeElement.textContent.replace(/[^0-9.-]/g, ''));
+
+            // Random small price movement
+            const randomChange = (Math.random() - 0.5) * 0.2;
+            const newChange = changePercent + randomChange;
+            const newPrice = currentPrice * (1 + randomChange / 100);
+
+            priceElement.textContent = `$${newPrice.toFixed(2)}`;
+            changeElement.textContent = `${newChange > 0 ? '+' : ''}${newChange.toFixed(2)}%`;
+            changeElement.className = newChange >= 0 ? 'asset-change positive' : 'asset-change negative';
+          }
+        });
+      }, 3000);
+    });
+  </script>
+</body>
+</html>

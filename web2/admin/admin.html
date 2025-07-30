@@ -1,0 +1,1877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProBTC - Admin CRM</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-color: #0a0a0a;
+      --text-color: #fff;
+      --card-bg: #111;
+      --accent: #ff6600;
+      --accent-light: rgba(255, 102, 0, 0.1);
+      --positive: #4caf50;
+      --negative: #e53935;
+      --warning: #ff9800;
+      --info: #2196f3;
+    }
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 250px 1fr;
+    }
+    /* Sidebar Styles */
+    .sidebar {
+      background: #111;
+      border-right: 1px solid var(--accent);
+      padding: 1rem 0;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+    }
+    .logo {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 1.5rem;
+      padding: 0 1rem 1.5rem;
+      border-bottom: 1px solid #333;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .logo i {
+      font-size: 1.8rem;
+    }
+    .nav-menu {
+      list-style: none;
+    }
+    .nav-menu li a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.8rem 1.5rem;
+      color: var(--text-color);
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+    .nav-menu li a:hover,
+    .nav-menu li a.active {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+    .nav-menu li a i {
+      width: 24px;
+      text-align: center;
+    }
+    /* Main Content Styles */
+    .main-content {
+      padding: 1.5rem;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #333;
+    }
+    .header h1 {
+      color: var(--accent);
+      font-size: 1.8rem;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+    /* Dashboard Cards */
+    .dashboard-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      border-left: 4px solid var(--accent);
+    }
+    .card h3 {
+      font-size: 1rem;
+      color: #aaa;
+      margin-bottom: 0.5rem;
+    }
+    .card .value {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+    .card.positive { border-left-color: var(--positive); }
+    .card.negative { border-left-color: var(--negative); }
+    .card.warning { border-left-color: var(--warning); }
+    .card.info { border-left-color: var(--info); }
+    /* Admin Tables */
+    .admin-section {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .section-header h2 {
+      color: var(--accent);
+      font-size: 1.3rem;
+    }
+    .search-filter {
+      display: flex;
+      gap: 1rem;
+    }
+    .search-filter input,
+    .search-filter select {
+      padding: 0.5rem 1rem;
+      background: #222;
+      border: 1px solid #333;
+      color: var(--text-color);
+      border-radius: 4px;
+    }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .admin-table th {
+      text-align: left;
+      padding: 0.8rem 1rem;
+      background: #222;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .admin-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid #333;
+    }
+    .admin-table tr:hover {
+      background: #222;
+    }
+    .status {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .status.active {
+      background: rgba(76, 175, 80, 0.2);
+      color: var(--positive);
+    }
+    .status.banned {
+      background: rgba(229, 57, 53, 0.2);
+      color: var(--negative);
+    }
+    .status.pending {
+      background: rgba(255, 152, 0, 0.2);
+      color: var(--warning);
+    }
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    .btn-sm {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.8rem;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+    }
+    .btn-primary:hover {
+      background: #ff8533;
+    }
+    .btn-success {
+      background: var(--positive);
+      color: #000;
+    }
+    .btn-danger {
+      background: var(--negative);
+      color: #fff;
+    }
+    .btn-warning {
+      background: var(--warning);
+      color: #000;
+    }
+    .btn-info {
+      background: var(--info);
+      color: #000;
+    }
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 2rem;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #333;
+    }
+    .modal-header h3 {
+      color: var(--accent);
+      font-size: 1.3rem;
+    }
+    .close-modal {
+      background: none;
+      border: none;
+      color: #aaa;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      background: #222;
+      border: 1px solid #333;
+      color: var(--text-color);
+      border-radius: 4px;
+    }
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    /* Tabs */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #333;
+      margin-bottom: 1.5rem;
+    }
+    .tab {
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .tab.active {
+      border-bottom-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    /* Crypto Address Styles */
+    .crypto-address {
+      font-family: monospace;
+      background: #222;
+      padding: 0.5rem;
+      border-radius: 4px;
+      word-break: break-all;
+    }
+    .qr-code {
+      background: #fff;
+      padding: 0.5rem;
+      border-radius: 4px;
+      display: inline-block;
+      margin: 0.5rem 0;
+    }
+    /* Responsive */
+    @media (max-width: 768px) {
+      body {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        display: none;
+      }
+      .dashboard-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="logo">
+      <i class="fas fa-coins"></i>
+      <span>ProBTC</span>
+    </div>
+    <ul class="nav-menu">
+      <li><a href="#" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+      <li><a href="#users"><i class="fas fa-users"></i> User Management</a></li>
+      <li><a href="#balances"><i class="fas fa-wallet"></i> Balance Control</a></li>
+      <li><a href="#deposits"><i class="fas fa-download"></i> Deposit Management</a></li>
+      <li><a href="#withdrawals"><i class="fas fa-upload"></i> Withdrawal Management</a></li>
+      <li><a href="#trades"><i class="fas fa-exchange-alt"></i> Trade Management</a></li>
+      <li><a href="#coins"><i class="fas fa-coins"></i> Coin Management</a></li>
+      <li><a href="#settings"><i class="fas fa-cog"></i> Website Settings</a></li>
+      <li><a href="#maintenance"><i class="fas fa-tools"></i> Maintenance</a></li>
+      <li><a href="#verification"><i class="fas fa-user-check"></i> Verification</a></li>
+      <li><a href="#languages"><i class="fas fa-language"></i> Languages</a></li>
+      <li><a href="#navigation"><i class="fas fa-bars"></i> Navigation</a></li>
+      <li><a href="#logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <div class="header">
+      <h1>Admin Dashboard</h1>
+      <div class="user-info">
+        <span>Admin User</span>
+        <div class="user-avatar">A</div>
+      </div>
+    </div>
+
+    <!-- Dashboard Cards -->
+    <div class="dashboard-cards">
+      <div class="card">
+        <h3>Total Users</h3>
+        <div class="value" id="total-users">0</div>
+      </div>
+      <div class="card positive">
+        <h3>Active Users</h3>
+        <div class="value" id="active-users">0</div>
+      </div>
+      <div class="card negative">
+        <h3>Banned Users</h3>
+        <div class="value" id="banned-users">0</div>
+      </div>
+      <div class="card warning">
+        <h3>Pending Verification</h3>
+        <div class="value" id="pending-verification">0</div>
+      </div>
+      <div class="card info">
+        <h3>Total Deposits</h3>
+        <div class="value" id="total-deposits">$0</div>
+      </div>
+      <div class="card">
+        <h3>Total Withdrawals</h3>
+        <div class="value" id="total-withdrawals">$0</div>
+      </div>
+      <div class="card positive">
+        <h3>Open Trades</h3>
+        <div class="value" id="open-trades">0</div>
+      </div>
+      <div class="card negative">
+        <h3>Closed Trades</h3>
+        <div class="value" id="closed-trades">0</div>
+      </div>
+    </div>
+
+    <!-- User Management Section -->
+    <div class="admin-section" id="users-section">
+      <div class="section-header">
+        <h2><i class="fas fa-users"></i> User Management</h2>
+        <div class="search-filter">
+          <input type="text" placeholder="Search users..." id="user-search">
+          <select id="user-status-filter">
+            <option>All Status</option>
+            <option>Active</option>
+            <option>Banned</option>
+            <option>Pending</option>
+          </select>
+          <button class="btn btn-primary" onclick="openModal('add-user')">
+            <i class="fas fa-plus"></i> Add User
+          </button>
+        </div>
+      </div>
+      <table class="admin-table" id="users-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Account Type</th>
+            <th>Balance</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="users-table-body">
+          <!-- Users will be loaded here dynamically -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Balance Control Section -->
+    <div class="admin-section" id="balances-section">
+      <div class="section-header">
+        <h2><i class="fas fa-wallet"></i> Balance Control</h2>
+        <div class="search-filter">
+          <input type="text" placeholder="Search users..." id="balance-search">
+          <button class="btn btn-primary" onclick="openModal('adjust-balance')">
+            <i class="fas fa-plus-circle"></i> Adjust Balance
+          </button>
+        </div>
+      </div>
+      <table class="admin-table" id="balances-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Current Balance</th>
+            <th>Last Transaction</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="balances-table-body">
+          <!-- Balances will be loaded here dynamically -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Deposit Management Section -->
+    <div class="admin-section" id="deposits-section">
+      <div class="section-header">
+        <h2><i class="fas fa-download"></i> Deposit Management</h2>
+        <div class="search-filter">
+          <input type="text" placeholder="Search deposits..." id="deposit-search">
+          <select id="deposit-status-filter">
+            <option>All Status</option>
+            <option>Pending</option>
+            <option>Completed</option>
+            <option>Failed</option>
+          </select>
+          <select id="deposit-method-filter">
+            <option>All Methods</option>
+            <option>BTC</option>
+            <option>ETH</option>
+            <option>Bank Transfer</option>
+          </select>
+        </div>
+      </div>
+      <table class="admin-table" id="deposits-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Amount</th>
+            <th>Method</th>
+            <th>Transaction ID</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="deposits-table-body">
+          <!-- Deposits will be loaded here dynamically -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Withdrawal Management Section -->
+    <div class="admin-section" id="withdrawals-section">
+      <div class="section-header">
+        <h2><i class="fas fa-upload"></i> Withdrawal Management</h2>
+        <div class="search-filter">
+          <input type="text" placeholder="Search withdrawals..." id="withdrawal-search">
+          <select id="withdrawal-status-filter">
+            <option>All Status</option>
+            <option>Pending</option>
+            <option>Completed</option>
+            <option>Failed</option>
+          </select>
+          <select id="withdrawal-method-filter">
+            <option>All Methods</option>
+            <option>BTC</option>
+            <option>ETH</option>
+            <option>Bank Transfer</option>
+          </select>
+        </div>
+      </div>
+      <table class="admin-table" id="withdrawals-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Amount</th>
+            <th>Method</th>
+            <th>Destination</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="withdrawals-table-body">
+          <!-- Withdrawals will be loaded here dynamically -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Trade Management Section -->
+    <div class="admin-section" id="trades-section">
+      <div class="section-header">
+        <h2><i class="fas fa-exchange-alt"></i> Trade Management</h2>
+        <div class="search-filter">
+          <input type="text" placeholder="Search trades..." id="trade-search">
+          <select id="trade-status-filter">
+            <option>All Status</option>
+            <option>Open</option>
+            <option>Closed</option>
+          </select>
+        </div>
+      </div>
+      <table class="admin-table" id="trades-table">
+        <thead>
+          <tr>
+            <th>Trade ID</th>
+            <th>User</th>
+            <th>Pair</th>
+            <th>Type</th>
+            <th>Entry Price</th>
+            <th>Current Price</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="trades-table-body">
+          <!-- Trades will be loaded here dynamically -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Coin Management Section -->
+    <div class="admin-section" id="coins-section">
+      <div class="section-header">
+        <h2><i class="fas fa-coins"></i> Coin Management</h2>
+        <button class="btn btn-primary" onclick="openModal('add-coin')">
+          <i class="fas fa-plus"></i> Add Coin
+        </button>
+      </div>
+      <table class="admin-table" id="coins-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Symbol</th>
+            <th>Price</th>
+            <th>24h Change</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="coins-table-body">
+          <!-- Coins will be loaded here dynamically -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Website Settings Section -->
+    <div class="admin-section" id="settings-section">
+      <div class="section-header">
+        <h2><i class="fas fa-cog"></i> Website Settings</h2>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('general-settings')">General</div>
+        <div class="tab" onclick="switchTab('theme-settings')">Theme</div>
+        <div class="tab" onclick="switchTab('email-settings')">Email</div>
+        <div class="tab" onclick="switchTab('security-settings')">Security</div>
+      </div>
+
+      <div class="tab-content active" id="general-settings">
+        <form id="general-settings-form">
+          <div class="form-group">
+            <label>Website Title</label>
+            <input type="text" name="website-title" id="website-title">
+          </div>
+          <div class="form-group">
+            <label>Website URL</label>
+            <input type="text" name="website-url" id="website-url">
+          </div>
+          <div class="form-group">
+            <label>Contact Email</label>
+            <input type="email" name="contact-email" id="contact-email">
+          </div>
+          <div class="form-group">
+            <label>Contact Phone</label>
+            <input type="tel" name="contact-phone" id="contact-phone">
+          </div>
+          <div class="form-group">
+            <label>Default Currency</label>
+            <select name="default-currency" id="default-currency">
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="GBP">GBP</option>
+              <option value="BTC">BTC</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-danger" onclick="resetSettings('general')">Reset</button>
+            <button type="button" class="btn btn-primary" onclick="saveSettings('general')">Save Changes</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="tab-content" id="theme-settings">
+        <form id="theme-settings-form">
+          <div class="form-group">
+            <label>Primary Color</label>
+            <input type="color" name="primary-color" id="primary-color">
+          </div>
+          <div class="form-group">
+            <label>Dark Mode</label>
+            <select name="dark-mode" id="dark-mode">
+              <option value="enabled">Enabled</option>
+              <option value="disabled">Disabled</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Logo</label>
+            <input type="file" name="logo" id="logo">
+          </div>
+          <div class="form-group">
+            <label>Favicon</label>
+            <input type="file" name="favicon" id="favicon">
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-danger" onclick="resetSettings('theme')">Reset</button>
+            <button type="button" class="btn btn-primary" onclick="saveSettings('theme')">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Maintenance Mode Section -->
+    <div class="admin-section" id="maintenance-section">
+      <div class="section-header">
+        <h2><i class="fas fa-tools"></i> Maintenance Mode</h2>
+      </div>
+      <form id="maintenance-form">
+        <div class="form-group">
+          <label>
+            <input type="checkbox" name="maintenance-mode" id="maintenance-mode"> Enable Maintenance Mode
+          </label>
+          <small>When enabled, only administrators can access the website.</small>
+        </div>
+        <div class="form-group">
+          <label>Maintenance Message</label>
+          <textarea rows="4" name="maintenance-message" id="maintenance-message"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" onclick="resetSettings('maintenance')">Reset</button>
+          <button type="button" class="btn btn-primary" onclick="saveSettings('maintenance')">Save Settings</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- User Verification Section -->
+    <div class="admin-section" id="verification-section">
+      <div class="section-header">
+        <h2><i class="fas fa-user-check"></i> User Verification</h2>
+        <div class="search-filter">
+          <input type="text" placeholder="Search users..." id="verification-search">
+          <select id="verification-status-filter">
+            <option>All Status</option>
+            <option>Pending</option>
+            <option>Verified</option>
+            <option>Rejected</option>
+          </select>
+        </div>
+      </div>
+      <table class="admin-table" id="verification-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Submitted</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="verification-table-body">
+          <!-- Verification requests will be loaded here dynamically -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Language Management Section -->
+    <div class="admin-section" id="languages-section">
+      <div class="section-header">
+        <h2><i class="fas fa-language"></i> Language Management</h2>
+        <button class="btn btn-primary" onclick="openModal('add-language')">
+          <i class="fas fa-plus"></i> Add Language
+        </button>
+      </div>
+      <table class="admin-table" id="languages-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Language</th>
+            <th>Code</th>
+            <th>Status</th>
+            <th>Default</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="languages-table-body">
+          <!-- Languages will be loaded here dynamically -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Navigation Management Section -->
+    <div class="admin-section" id="navigation-section">
+      <div class="section-header">
+        <h2><i class="fas fa-bars"></i> Navigation Management</h2>
+        <button class="btn btn-primary" onclick="openModal('add-menu-item')">
+          <i class="fas fa-plus"></i> Add Item
+        </button>
+      </div>
+      <table class="admin-table" id="navigation-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>URL</th>
+            <th>Order</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="navigation-table-body">
+          <!-- Navigation items will be loaded here dynamically -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Modals -->
+  <div class="modal" id="add-user-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add New User</h3>
+        <button class="close-modal" onclick="closeModal('add-user')">&times;</button>
+      </div>
+      <form id="add-user-form">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" name="full-name" placeholder="Enter full name" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="Enter email" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" placeholder="Enter password" required>
+        </div>
+        <div class="form-group">
+          <label>Account Type</label>
+          <select name="account-type" required>
+            <option value="basic">Basic</option>
+            <option value="pro">Pro</option>
+            <option value="institutional">Institutional</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Initial Balance</label>
+          <input type="number" name="initial-balance" placeholder="0.00" step="0.01" required>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('add-user')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="edit-user-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Edit User</h3>
+        <button class="close-modal" onclick="closeModal('edit-user')">&times;</button>
+      </div>
+      <form id="edit-user-form">
+        <input type="hidden" name="user-id" id="edit-user-id">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" name="full-name" id="edit-full-name" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" id="edit-email" required>
+        </div>
+        <div class="form-group">
+          <label>Account Type</label>
+          <select name="account-type" id="edit-account-type" required>
+            <option value="basic">Basic</option>
+            <option value="pro">Pro</option>
+            <option value="institutional">Institutional</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select name="status" id="edit-status" required>
+            <option value="active">Active</option>
+            <option value="banned">Banned</option>
+            <option value="pending">Pending</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('edit-user')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="adjust-balance-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Adjust User Balance</h3>
+        <button class="close-modal" onclick="closeModal('adjust-balance')">&times;</button>
+      </div>
+      <form id="adjust-balance-form">
+        <div class="form-group">
+          <label>User</label>
+          <select name="user" id="balance-user-select" required>
+            <!-- Users will be loaded here dynamically -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Action</label>
+          <select name="action" id="balance-action" required>
+            <option value="add">Add Balance</option>
+            <option value="remove">Remove Balance</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Amount</label>
+          <input type="number" name="amount" placeholder="0.00" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label>Reason</label>
+          <textarea rows="3" name="reason" placeholder="Enter reason for this adjustment" required></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('adjust-balance')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Process Adjustment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Deposit Crypto Modal -->
+  <div class="modal" id="deposit-crypto-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Deposit Cryptocurrency</h3>
+        <button class="close-modal" onclick="closeModal('deposit-crypto')">&times;</button>
+      </div>
+      <form id="deposit-crypto-form">
+        <div class="form-group">
+          <label>User</label>
+          <select name="user" id="deposit-user-select" required>
+            <!-- Users will be loaded here dynamically -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Cryptocurrency</label>
+          <select name="crypto" id="crypto-select" required>
+            <option value="BTC">Bitcoin (BTC)</option>
+            <option value="ETH">Ethereum (ETH)</option>
+          </select>
+        </div>
+
+        <!-- Bitcoin Deposit -->
+        <div id="btc-deposit" class="crypto-deposit">
+          <div class="form-group">
+            <label>BTC Deposit Address</label>
+            <div class="crypto-address" id="btc-address"></div>
+            <div class="qr-code">
+              <img id="btc-qr-code" src="" alt="BTC Deposit QR Code">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Minimum Deposit</label>
+            <input type="text" value="0.0005 BTC" readonly>
+          </div>
+        </div>
+
+        <!-- Ethereum Deposit -->
+        <div id="eth-deposit" class="crypto-deposit" style="display:none;">
+          <div class="form-group">
+            <label>ETH Deposit Address</label>
+            <div class="crypto-address" id="eth-address"></div>
+            <div class="qr-code">
+              <img id="eth-qr-code" src="" alt="ETH Deposit QR Code">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Minimum Deposit</label>
+            <input type="text" value="0.01 ETH" readonly>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Notes</label>
+          <textarea rows="3" name="notes" placeholder="Enter any notes about this deposit"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('deposit-crypto')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Confirm Deposit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Approve Withdrawal Modal -->
+  <div class="modal" id="approve-withdrawal-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Approve Withdrawal</h3>
+        <button class="close-modal" onclick="closeModal('approve-withdrawal')">&times;</button>
+      </div>
+      <form id="approve-withdrawal-form">
+        <input type="hidden" name="withdrawal-id" id="withdrawal-id">
+        <div class="form-group">
+          <label>Withdrawal ID</label>
+          <input type="text" id="withdrawal-id-display" readonly>
+        </div>
+        <div class="form-group">
+          <label>User</label>
+          <input type="text" id="withdrawal-user" readonly>
+        </div>
+        <div class="form-group">
+          <label>Amount</label>
+          <input type="text" id="withdrawal-amount" readonly>
+        </div>
+        <div class="form-group">
+          <label>Destination Address</label>
+          <div class="crypto-address" id="withdrawal-destination"></div>
+        </div>
+        <div class="form-group">
+          <label>Transaction Fee</label>
+          <input type="text" id="withdrawal-fee" readonly>
+        </div>
+        <div class="form-group">
+          <label>Network Confirmation</label>
+          <input type="text" name="tx-hash" id="tx-hash" placeholder="Enter transaction hash when completed">
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <textarea rows="3" name="notes" id="withdrawal-notes" placeholder="Enter any notes about this withdrawal"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('approve-withdrawal')">Cancel</button>
+          <button type="submit" class="btn btn-success">Process Withdrawal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="add-coin-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add New Coin</h3>
+        <button class="close-modal" onclick="closeModal('add-coin')">&times;</button>
+      </div>
+      <form id="add-coin-form">
+        <div class="form-group">
+          <label>Coin Name</label>
+          <input type="text" name="coin-name" placeholder="Enter coin name" required>
+        </div>
+        <div class="form-group">
+          <label>Symbol</label>
+          <input type="text" name="symbol" placeholder="Enter symbol (e.g. BTC)" required>
+        </div>
+        <div class="form-group">
+          <label>Coin Logo</label>
+          <input type="file" name="logo" required>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select name="status" required>
+            <option value="active">Active</option>
+            <option value="disabled">Disabled</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('add-coin')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Coin</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="add-language-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add New Language</h3>
+        <button class="close-modal" onclick="closeModal('add-language')">&times;</button>
+      </div>
+      <form id="add-language-form">
+        <div class="form-group">
+          <label>Language Name</label>
+          <input type="text" name="language-name" placeholder="Enter language name" required>
+        </div>
+        <div class="form-group">
+          <label>Language Code</label>
+          <input type="text" name="language-code" placeholder="Enter 2-letter code (e.g. 'es')" required>
+        </div>
+        <div class="form-group">
+          <label>Language File</label>
+          <input type="file" name="language-file" required>
+        </div>
+        <div class="form-group">
+          <label>Set as Default</label>
+          <input type="checkbox" name="default-language">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select name="status" required>
+            <option value="active">Active</option>
+            <option value="disabled">Disabled</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('add-language')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Language</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="add-menu-item-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add Navigation Item</h3>
+        <button class="close-modal" onclick="closeModal('add-menu-item')">&times;</button>
+      </div>
+      <form id="add-menu-item-form">
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" name="title" placeholder="Enter menu item title" required>
+        </div>
+        <div class="form-group">
+          <label>URL</label>
+          <input type="text" name="url" placeholder="Enter URL (e.g. '/about')" required>
+        </div>
+        <div class="form-group">
+          <label>Order</label>
+          <input type="number" name="order" placeholder="Enter display order" required>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select name="status" required>
+            <option value="active">Active</option>
+            <option value="disabled">Disabled</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('add-menu-item')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Global state
+    let users = [];
+    let deposits = [];
+    let withdrawals = [];
+    let trades = [];
+    let coins = [];
+    let languages = [];
+    let menuItems = [];
+    let verificationRequests = [];
+    let settings = {
+      general: {
+        websiteTitle: "ProBTC Trading Platform",
+        websiteUrl: "https://probtc.com",
+        contactEmail: "support@probtc.com",
+        contactPhone: "+1 (555) 123-4567",
+        defaultCurrency: "USD"
+      },
+      theme: {
+        primaryColor: "#ff6600",
+        darkMode: "enabled"
+      },
+      maintenance: {
+        enabled: false,
+        message: "We're currently performing scheduled maintenance. We'll be back online shortly. Thank you for your patience."
+      }
+    };
+
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', function() {
+      loadInitialData();
+      setupEventListeners();
+      updateDashboardStats();
+      updateCoinPrices();
+
+      // Update coin prices every 60 seconds
+      setInterval(updateCoinPrices, 60000);
+    });
+
+    // Load initial data
+    function loadInitialData() {
+      // In a real app, this would be API calls to your backend
+      // For now, we'll use mock data
+
+      // Load users
+      users = [
+        // Will be populated by admin
+      ];
+
+      // Load coins with live data
+      coins = [
+        { id: 1, name: "Bitcoin", symbol: "BTC", price: 0, change24h: 0, status: "active" },
+        { id: 2, name: "Ethereum", symbol: "ETH", price: 0, change24h: 0, status: "active" }
+      ];
+
+      // Load other empty data
+      deposits = [];
+      withdrawals = [];
+      trades = [];
+      languages = [];
+      menuItems = [];
+      verificationRequests = [];
+
+      // Render all tables
+      renderUsersTable();
+      renderBalancesTable();
+      renderDepositsTable();
+      renderWithdrawalsTable();
+      renderTradesTable();
+      renderCoinsTable();
+      renderLanguagesTable();
+      renderNavigationTable();
+      renderVerificationTable();
+
+      // Load settings
+      loadSettings();
+    }
+
+    // Setup event listeners
+    function setupEventListeners() {
+      // User management
+      document.getElementById('add-user-form').addEventListener('submit', addUser);
+      document.getElementById('edit-user-form').addEventListener('submit', updateUser);
+      document.getElementById('user-search').addEventListener('input', filterUsers);
+      document.getElementById('user-status-filter').addEventListener('change', filterUsers);
+
+      // Balance management
+      document.getElementById('adjust-balance-form').addEventListener('submit', adjustBalance);
+      document.getElementById('balance-search').addEventListener('input', filterBalances);
+
+      // Deposit management
+      document.getElementById('deposit-search').addEventListener('input', filterDeposits);
+      document.getElementById('deposit-status-filter').addEventListener('change', filterDeposits);
+      document.getElementById('deposit-method-filter').addEventListener('change', filterDeposits);
+      document.getElementById('deposit-crypto-form').addEventListener('submit', processCryptoDeposit);
+      document.getElementById('crypto-select').addEventListener('change', function() {
+        const cryptoType = this.value;
+        document.querySelectorAll('.crypto-deposit').forEach(el => {
+          el.style.display = 'none';
+        });
+        document.getElementById(${cryptoType.toLowerCase()}-deposit).style.display = 'block';
+      });
+
+      // Withdrawal management
+      document.getElementById('withdrawal-search').addEventListener('input', filterWithdrawals);
+      document.getElementById('withdrawal-status-filter').addEventListener('change', filterWithdrawals);
+      document.getElementById('withdrawal-method-filter').addEventListener('change', filterWithdrawals);
+      document.getElementById('approve-withdrawal-form').addEventListener('submit', processWithdrawal);
+
+      // Coin management
+      document.getElementById('add-coin-form').addEventListener('submit', addCoin);
+
+      // Settings
+      document.getElementById('general-settings-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        saveSettings('general');
+      });
+      document.getElementById('theme-settings-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        saveSettings('theme');
+      });
+      document.getElementById('maintenance-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        saveSettings('maintenance');
+      });
+    }
+
+    // Modal functions
+    function openModal(modalId) {
+      // Prepare modal data if needed
+      if (modalId === 'add-user') {
+        resetAddUserForm();
+      } else if (modalId === 'adjust-balance') {
+        prepareBalanceAdjustmentForm();
+      } else if (modalId === 'deposit-crypto') {
+        prepareCryptoDepositForm();
+      }
+
+      document.getElementById(${modalId}-modal).style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(${modalId}-modal).style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      if (event.target.className === 'modal') {
+        event.target.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    // Tab switching
+    function switchTab(tabId) {
+      // Hide all tab contents
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      // Deactivate all tabs
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      // Activate selected tab
+      document.querySelector(.tab[onclick="switchTab('${tabId}')"]).classList.add('active');
+
+      // Show selected tab content
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    // User management functions
+    function addUser(e) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+
+      const newUser = {
+        id: generateId(),
+        name: formData.get('full-name'),
+        email: formData.get('email'),
+        password: formData.get('password'),
+        accountType: formData.get('account-type'),
+        balance: parseFloat(formData.get('initial-balance')) || 0,
+        status: 'active',
+        createdAt: new Date().toISOString()
+      };
+
+      users.push(newUser);
+      renderUsersTable();
+      updateDashboardStats();
+      closeModal('add-user');
+      form.reset();
+
+      alert('User added successfully!');
+    }
+
+    function editUser(userId) {
+      const user = users.find(u => u.id === userId);
+      if (!user) return;
+
+      document.getElementById('edit-user-id').value = user.id;
+      document.getElementById('edit-full-name').value = user.name;
+      document.getElementById('edit-email').value = user.email;
+      document.getElementById('edit-account-type').value = user.accountType;
+      document.getElementById('edit-status').value = user.status;
+
+      openModal('edit-user');
+    }
+
+    function updateUser(e) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+      const userId = formData.get('user-id');
+
+      const userIndex = users.findIndex(u => u.id === userId);
+      if (userIndex === -1) return;
+
+      users[userIndex] = {
+        ...users[userIndex],
+        name: formData.get('full-name'),
+        email: formData.get('email'),
+        accountType: formData.get('account-type'),
+        status: formData.get('status')
+      };
+
+      renderUsersTable();
+      updateDashboardStats();
+      closeModal('edit-user');
+      form.reset();
+
+      alert('User updated successfully!');
+    }
+
+    function toggleUserStatus(userId, status) {
+      const userIndex = users.findIndex(u => u.id === userId);
+      if (userIndex === -1) return;
+
+      users[userIndex].status = status;
+      renderUsersTable();
+      updateDashboardStats();
+
+      alert(User ${status} successfully!);
+    }
+
+    function filterUsers() {
+      const searchTerm = document.getElementById('user-search').value.toLowerCase();
+      const statusFilter = document.getElementById('user-status-filter').value;
+
+      const filteredUsers = users.filter(user => {
+        const matchesSearch = user.name.toLowerCase().includes(searchTerm) ||
+                             user.email.toLowerCase().includes(searchTerm);
+        const matchesStatus = statusFilter === 'All Status' || user.status === statusFilter.toLowerCase();
+        return matchesSearch && matchesStatus;
+      });
+
+      renderUsersTable(filteredUsers);
+    }
+
+    function renderUsersTable(usersToRender = users) {
+      const tbody = document.getElementById('users-table-body');
+      tbody.innerHTML = '';
+
+      if (usersToRender.length === 0) {
+        tbody.innerHTML = <tr><td colspan="7" class="text-center">No users found</td></tr>;
+        return;
+      }
+
+      usersToRender.forEach(user => {
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+          <td>#${user.id}</td>
+          <td>${user.name}</td>
+          <td>${user.email}</td>
+          <td>${user.accountType.charAt(0).toUpperCase() + user.accountType.slice(1)}</td>
+          <td>$${user.balance.toFixed(2)}</td>
+          <td><span class="status ${user.status}">${user.status.charAt(0).toUpperCase() + user.status.slice(1)}</span></td>
+          <td>
+            <button class="btn btn-sm btn-primary" onclick="editUser('${user.id}')">
+              <i class="fas fa-edit"></i>
+            </button>
+            ${user.status === 'banned' ? `
+              <button class="btn btn-sm btn-success" onclick="toggleUserStatus('${user.id}', 'active')">
+                <i class="fas fa-check"></i>
+              </button>
+            ` : `
+              <button class="btn btn-sm btn-danger" onclick="toggleUserStatus('${user.id}', 'banned')">
+                <i class="fas fa-ban"></i>
+              </button>
+            `}
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Balance management functions
+    function prepareBalanceAdjustmentForm() {
+      const select = document.getElementById('balance-user-select');
+      select.innerHTML = '';
+
+      users.forEach(user => {
+        const option = document.createElement('option');
+        option.value = user.id;
+        option.textContent = ${user.name} (${user.email}) - $${user.balance.toFixed(2)};
+        select.appendChild(option);
+      });
+    }
+
+    function adjustBalance(e) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+
+      const userId = formData.get('user');
+      const action = formData.get('action');
+      const amount = parseFloat(formData.get('amount'));
+      const reason = formData.get('reason');
+
+      const userIndex = users.findIndex(u => u.id === userId);
+      if (userIndex === -1) return;
+
+      if (action === 'add') {
+        users[userIndex].balance += amount;
+      } else {
+        if (users[userIndex].balance < amount) {
+          alert('Insufficient balance!');
+          return;
+        }
+        users[userIndex].balance -= amount;
+      }
+
+      // Record transaction
+      const transaction = {
+        id: generateId(),
+        userId,
+        type: action === 'add' ? 'credit' : 'debit',
+        amount,
+        reason,
+        date: new Date().toISOString()
+      };
+
+      // In a real app, you would save this transaction to your database
+
+      renderUsersTable();
+      renderBalancesTable();
+      updateDashboardStats();
+      closeModal('adjust-balance');
+      form.reset();
+
+      alert(Balance ${action === 'add' ? 'added' : 'deducted'} successfully!);
+    }
+
+    function filterBalances() {
+      const searchTerm = document.getElementById('balance-search').value.toLowerCase();
+
+      const filteredUsers = users.filter(user => {
+        return user.name.toLowerCase().includes(searchTerm) ||
+               user.email.toLowerCase().includes(searchTerm);
+      });
+
+      renderBalancesTable(filteredUsers);
+    }
+
+    function renderBalancesTable(usersToRender = users) {
+      const tbody = document.getElementById('balances-table-body');
+      tbody.innerHTML = '';
+
+      if (usersToRender.length === 0) {
+        tbody.innerHTML = <tr><td colspan="6" class="text-center">No users found</td></tr>;
+        return;
+      }
+
+      usersToRender.forEach(user => {
+        const tr = document.createElement('tr');
+
+        // In a real app, you would fetch the last transaction from your database
+        const lastTransaction = "No transactions yet";
+
+        tr.innerHTML = `
+          <td>#${user.id}</td>
+          <td>${user.name}</td>
+          <td>${user.email}</td>
+          <td>$${user.balance.toFixed(2)}</td>
+          <td>${lastTransaction}</td>
+          <td>
+            <button class="btn btn-sm btn-primary" onclick="openModal('adjust-balance')">
+              <i class="fas fa-edit"></i> Adjust
+            </button>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Deposit management functions
+    function prepareCryptoDepositForm() {
+      const select = document.getElementById('deposit-user-select');
+      select.innerHTML = '';
+
+      users.forEach(user => {
+        const option = document.createElement('option');
+        option.value = user.id;
+        option.textContent = ${user.name} (${user.email});
+        select.appendChild(option);
+      });
+
+      // Generate deposit addresses (in a real app, these would come from your wallet system)
+      document.getElementById('btc-address').textContent = generateCryptoAddress('BTC');
+      document.getElementById('eth-address').textContent = generateCryptoAddress('ETH');
+
+      // Generate QR codes
+      document.getElementById('btc-qr-code').src = https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=bitcoin:${document.getElementById('btc-address').textContent};
+      document.getElementById('eth-qr-code').src = https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=ethereum:${document.getElementById('eth-address').textContent};
+    }
+
+    function processCryptoDeposit(e) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+
+      const userId = formData.get('user');
+      const crypto = formData.get('crypto');
+      const notes = formData.get('notes');
+
+      // In a real app, you would:
+      // 1. Verify the deposit with your wallet system
+      // 2. Create a deposit record
+      // 3. Credit the user's account when the deposit is confirmed
+
+      const newDeposit = {
+        id: D-${generateId()},
+        userId,
+        amount: 0 ${crypto}, // Amount would come from blockchain confirmation
+        method: crypto,
+        address: crypto === 'BTC' ? document.getElementById('btc-address').textContent : document.getElementById('eth-address').textContent,
+        status: 'pending',
+        date: new Date().toISOString(),
+        notes
+      };
+
+      deposits.push(newDeposit);
+      renderDepositsTable();
+      updateDashboardStats();
+      closeModal('deposit-crypto');
+      form.reset();
+
+      alert(${crypto} deposit address generated successfully!);
+    }
+
+    function approveDeposit(depositId) {
+      const depositIndex = deposits.findIndex(d => d.id === depositId);
+      if (depositIndex === -1) return;
+
+      deposits[depositIndex].status = 'completed';
+
+      // In a real app, you would credit the user's account here
+      const userId = deposits[depositIndex].userId;
+      const amount = parseFloat(deposits[depositIndex].amount.split(' ')[0]);
+      const crypto = deposits[depositIndex].method;
+
+      // Find user and update balance (converted to USD at current rate)
+      const userIndex = users.findIndex(u => u.id === userId);
+      if (userIndex !== -1) {
+        const cryptoPrice = coins.find(c => c.symbol === crypto)?.price || 0;
+        users[userIndex].balance += amount * cryptoPrice;
+      }
+
+      renderDepositsTable();
+      renderUsersTable();
+      updateDashboardStats();
+
+      alert('Deposit approved successfully!');
+    }
+
+    function rejectDeposit(depositId) {
+      const depositIndex = deposits.findIndex(d => d.id === depositId);
+      if (depositIndex === -1) return;
+
+      deposits[depositIndex].status = 'failed';
+      renderDepositsTable();
+
+      alert('Deposit rejected successfully!');
+    }
+
+    function filterDeposits() {
+      const searchTerm = document.getElementById('deposit-search').value.toLowerCase();
+      const statusFilter = document.getElementById('deposit-status-filter').value;
+      const methodFilter = document.getElementById('deposit-method-filter').value;
+
+      const filteredDeposits = deposits.filter(deposit => {
+        const user = users.find(u => u.id === deposit.userId);
+        const userName = user ? user.name.toLowerCase() : '';
+        const userEmail = user ? user.email.toLowerCase() : '';
+
+        const matchesSearch = userName.includes(searchTerm) ||
+                             userEmail.includes(searchTerm) ||
+                             deposit.id.toLowerCase().includes(searchTerm);
+        const matchesStatus = statusFilter === 'All Status' || deposit.status === statusFilter.toLowerCase();
+        const matchesMethod = methodFilter === 'All Methods' || deposit.method === methodFilter;
+
+        return matchesSearch && matchesStatus && matchesMethod;
+      });
+
+      renderDepositsTable(filteredDeposits);
+    }
+
+    function renderDepositsTable(depositsToRender = deposits) {
+      const tbody = document.getElementById('deposits-table-body');
+      tbody.innerHTML = '';
+
+      if (depositsToRender.length === 0) {
+        tbody.innerHTML = <tr><td colspan="8" class="text-center">No deposits found</td></tr>;
+        return;
+      }
+
+      depositsToRender.forEach(deposit => {
+        const user = users.find(u => u.id === deposit.userId);
+        const userName = user ? user.name : 'Unknown User';
+
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+          <td>${deposit.id}</td>
+          <td>${userName}</td>
+          <td>${deposit.amount}</td>
+          <td>${deposit.method}</td>
+          <td class="crypto-address">${deposit.address || deposit.id}</td>
+          <td>${new Date(deposit.date).toLocaleString()}</td>
+          <td><span class="status ${deposit.status}">${deposit.status.charAt(0).toUpperCase() + deposit.status.slice(1)}</span></td>
+          <td>
+            ${deposit.status === 'pending' ? `
+              <button class="btn btn-sm btn-success" onclick="approveDeposit('${deposit.id}')">
+                <i class="fas fa-check"></i> Approve
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="rejectDeposit('${deposit.id}')">
+                <i class="fas fa-times"></i> Reject
+              </button>
+            ` : `
+              <button class="btn btn-sm btn-info">
+                <i class="fas fa-eye"></i> View
+              </button>
+            `}
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Withdrawal management functions
+    function approveWithdrawal(withdrawalId) {
+      openModal('approve-withdrawal');
+
+      const withdrawal = withdrawals.find(w => w.id === withdrawalId);
+      if (!withdrawal) return;
+
+      document.getElementById('withdrawal-id').value = withdrawal.id;
+      document.getElementById('withdrawal-id-display').value = withdrawal.id;
+
+      const user = users.find(u => u.id === withdrawal.userId);
+      document.getElementById('withdrawal-user').value = user ? ${user.name} (${user.email}) : 'Unknown User';
+
+      document.getElementById('withdrawal-amount').value = withdrawal.amount;
+      document.getElementById('withdrawal-destination').textContent = withdrawal.address;
+      document.getElementById('withdrawal-fee').value = withdrawal.fee || '0.001 ' + withdrawal.method;
+      document.getElementById('withdrawal-notes').value = withdrawal.notes || '';
+    }
+
+    function processWithdrawal(e) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+
+      const withdrawalId = formData.get('withdrawal-id');
+      const txHash = formData.get('tx-hash');
+      const notes = formData.get('notes');
+
+      const withdrawalIndex = withdrawals.findIndex(w => w.id === withdrawalId);
+      if (withdrawalIndex === -1) return;
+
+      withdrawals[withdrawalIndex].status = 'completed';
+      withdrawals[withdrawalIndex].txHash = txHash;
+      withdrawals[withdrawalIndex].processedAt = new Date().toISOString();
+      withdrawals[withdrawalIndex].notes = notes;
+
+      renderWithdrawalsTable();
+      updateDashboardStats();
+      closeModal('approve-withdrawal');
+      form.reset();
+
+      alert('Withdrawal processed successfully!');
+    }
+
+    function rejectWithdrawal(withdrawalId) {
+      const withdrawalIndex = withdrawals.findIndex(w => w.id === withdrawalId);
+      if (withdrawalIndex === -1) return;
+
+      withdrawals[withdrawalIndex].status = 'failed';
+      renderWithdrawalsTable();
+
+      alert('Withdrawal rejected successfully!');
+    }
+
+    function filterWithdrawals() {
+      const searchTerm = document.getElementById('withdrawal-search').value.toLowerCase();
+      const statusFilter = document.getElementById('withdrawal-status-filter').value;
+      const methodFilter = document.getElementById('withdrawal-method-filter').value;
+
+      const filteredWithdrawals = withdrawals.filter(withdrawal => {
+        const user = users.find(u => u.id === withdrawal.userId);
+        const userName = user ? user.name.toLowerCase() : '';
+        const userEmail = user ? user.email.toLowerCase() : '';
+
+        const matchesSearch = userName.includes(searchTerm) ||
+                             userEmail.includes(searchTerm) ||
+                             withdrawal.id.toLowerCase().includes(searchTerm);
+        const matchesStatus = statusFilter === 'All Status' || withdrawal.status === statusFilter.toLowerCase();
+        const matchesMethod = methodFilter === 'All Methods' || withdrawal.method === methodFilter;
+
+        return matchesSearch && matchesStatus && matchesMethod;
+      });
+
+      renderWithdrawalsTable(filteredWithdrawals);
+    }
+
+    function renderWithdrawalsTable(withdrawalsToRender = withdrawals) {
+      const tbody = document.getElementById('withdrawals-table-body');
+      tbody.innerHTML = '';
+
+      if (withdrawalsToRender.length === 0) {
+        tbody.innerHTML = <tr><td colspan="8" class="text-center">No withdrawals found</td></tr>;
+        return;
+      }
+
+      withdrawalsToRender.forEach(withdrawal => {
+        const user = users.find(u => u.id === withdrawal.userId);
+        const userName = user ? user.name : 'Unknown User';
+
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+          <td>${withdrawal.id}</td>
+          <td>${userName}</td>
+          <td>${withdrawal.amount}</td>
+          <td>${withdrawal.method}</td>
+          <td class="crypto-address">${withdrawal.address}</td>
+          <td>${new Date(withdrawal.date).toLocaleString()}</td>
+          <td><span class="status ${withdrawal.status}">${withdrawal.status.charAt(0).toUpperCase() + withdrawal.status.slice(1)}</span></td>
+          <td>
+            ${withdrawal.status === 'pending' ? `
+              <button class="btn btn-sm btn-success" onclick="approveWithdrawal('${withdrawal.id}')">
+                <i class="fas fa-check"></i> Approve
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="rejectWithdrawal('${withdrawal.id}')">
+                <i class="fas fa-times"></i> Reject
+              </button>
+            ` : `
+              <button class="btn btn-sm btn-info">
+                <i class="fas fa-eye"></i> View
+              </button>
+            `}
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Coin management functions
+    function addCoin(e) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+
+      const newCoin = {
+        id: coins.length + 1,
+        name: formData.get('coin-name'),
+        symbol: formData.get('symbol').toUpperCase(),
+        price: 0,
+        change24h: 0,
+        status: formData.get('status')
+      };
+
+      coins.push(newCoin);
+      renderCoinsTable();
+      closeModal('add-coin');
+      form.reset();
+
+      alert('Coin added successfully!');
+    }
+
+    function toggleCoinStatus(coinId, status) {
+      const coinIndex = coins.findIndex(c => c.id === coinId);
+      if (coinIndex === -1) return;
+
+      coins[coinIndex].status = status;
+      renderCoinsTable();
+
+      alert(Coin ${status === 'active' ? 'activated' : 'disabled'} successfully!);
+    }
+
+    function updateCoinPrices() {
+      // In a real app, you would fetch these from a cryptocurrency API
+      // For demo purposes, we'll use mock data that changes randomly
+
+      coins.forEach(coin => {
+        if (coin.symbol === 'BTC') {
+          // Simulate BTC price between 40,000 and 50,000
+          coin.price = (40000 + Math.random() * 10000).toFixed(2);
+          // Simulate 24h change between -5% and +5%
+          coin.change24h = (-5 + Math.random() * 10).toFixed(2);
+        } else if (coin.symbol === 'ETH') {
+          // Simulate ETH price between 2,000 and 3,000
+          coin.price = (2000 + Math.random() * 1000).toFixed(2);
+          // Simulate 24h change between -5% and +5%
+          coin.change24h = (-5 + Math.random() * 10).toFixed(2);
+        }
+      });
+
+      renderCoinsTable();
+    }
+
+    function renderCoinsTable() {
+      const tbody = document.getElementById('coins-table-body');
+      tbody.innerHTML = '';
+
+      if (coins.length === 0) {
+        tbody.innerHTML = <tr><td colspan="7" class="text-center">No coins found</td></tr>;
+        return;
+      }
+
+      coins.forEach(coin => {
+        const tr = document.createElement('tr');
+
+        const changeClass = parseFloat(coin.change24h) >= 0 ? 'positive' : 'negative';
+        const changeSymbol = parse
